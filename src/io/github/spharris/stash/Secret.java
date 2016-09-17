@@ -9,9 +9,10 @@ import com.google.common.collect.ImmutableList;
 
 @AutoValue
 public abstract class Secret {
-  public abstract @Nullable String getName();
-  public abstract @Nullable String getProject();
-  public abstract @Nullable String getEnvironment();
+  
+  Secret() {}
+  
+  public abstract @Nullable String getSecretId();
   public abstract @Nullable String getDescription();
   public abstract @Nullable String getSecretValue();
   public abstract ImmutableList<Role> getRoles();
@@ -26,9 +27,7 @@ public abstract class Secret {
   
   @AutoValue.Builder
   public abstract static class Builder {
-    public abstract Builder setName(String name);
-    public abstract Builder setProject(String project);
-    public abstract Builder setEnvironment(String environment);
+    public abstract Builder setSecretId(String name);
     public abstract Builder setDescription(String description);
     public abstract Builder setSecretValue(String secretValue);
     public abstract Builder setRoles(ImmutableList<Role> roles);
