@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableList;
 
 import io.github.spharris.stash.Project;
 
+@Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public final class ProjectController {

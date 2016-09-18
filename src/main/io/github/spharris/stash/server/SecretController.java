@@ -15,7 +15,7 @@ import io.github.spharris.stash.Secret;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public final  class SecretController {
+public final class SecretController {
   
   @GET
   @Path("/projects/{projectId}/environments/{environmentId}/secrets")

@@ -14,7 +14,7 @@ public abstract class Secret {
   
   public abstract String getSecretId();
   public abstract @Nullable String getDescription();
-  public abstract @Nullable String getSecretValue();
+  public abstract @Nullable  String getSecretValue();
   public abstract ImmutableList<Role> getRoles();
   public abstract ImmutableList<Group> getGroups();
   
