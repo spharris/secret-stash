@@ -6,23 +6,23 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 
 @AutoValue
-abstract class Response<T> {
+public abstract class Response<T> {
   
   Response() {}
   
-  abstract @Nullable T getValue();
-  abstract ImmutableList<Error> getErrors();
+  public abstract @Nullable T getValue();
+  public abstract ImmutableList<Error> getErrors();
   
-  static <T> Builder<T> builder() {
+  public static <T> Builder<T> builder() {
     return new AutoValue_Response.Builder<T>()
         .setErrors(ImmutableList.<Error>of());
   }
   
   @AutoValue.Builder
-  abstract static class Builder<T> {
-    abstract Builder<T> setValue(T value);
-    abstract Builder<T> setErrors(ImmutableList<Error> errors);
+  public abstract static class Builder<T> {
+    public abstract Builder<T> setValue(T value);
+    public abstract Builder<T> setErrors(ImmutableList<Error> errors);
     
-    abstract Response<T> build();
+    public abstract Response<T> build();
   }
 }

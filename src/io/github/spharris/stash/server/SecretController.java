@@ -13,13 +13,12 @@ import com.google.common.collect.ImmutableList;
 
 import io.github.spharris.stash.Secret;
 
-@Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-class SecretController {
+public final  class SecretController {
   
   @GET
-  @Path("{projectId}/{environmentId}")
+  @Path("/projects/{projectId}/environments/{environmentId}/secrets")
   public Response<ImmutableList<Secret>> listSecrets(
       @PathParam("projectId") String projectId,
       @PathParam("environmentId") String environmentId) {
@@ -27,7 +26,7 @@ class SecretController {
   }
   
   @PUT
-  @Path("{projectId}/{environmentId}")
+  @Path("/projects/{projectId}/environments/{environmentId}/secrets")
   public Response<Secret> createSecret(
       @PathParam("projectId") String projectId,
       @PathParam("environmentId") String environmentId,
@@ -36,7 +35,7 @@ class SecretController {
   }
   
   @GET
-  @Path("{projectId}/{environmentId}/{secretId}")
+  @Path("/projects/{projectId}/environments/{environmentId}/secrets/{secretId}")
   public Response<Secret> getSecret(
       @PathParam("projectId") String projectId,
       @PathParam("environmentId") String environmentId,
@@ -45,7 +44,7 @@ class SecretController {
   }
   
   @PUT
-  @Path("{projectId}/{environmentId}/{secretId}")
+  @Path("/projects/{projectId}/environments/{environmentId}/secrets/{secretId}")
   public Response<Secret> updateSecret(
       @PathParam("projectId") String projectId,
       @PathParam("environmentId") String environmentId,
@@ -55,7 +54,7 @@ class SecretController {
   }
   
   @DELETE
-  @Path("{projectId}/{environmentId}/{secretId}")
+  @Path("/projects/{projectId}/environments/{environmentId}/secrets/{secretId}")
   public Response<Void> deleteSecret(
       @PathParam("projectId") String projectId,
       @PathParam("environmentId") String environmentId,

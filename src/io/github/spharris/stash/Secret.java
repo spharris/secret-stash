@@ -12,7 +12,7 @@ public abstract class Secret {
   
   Secret() {}
   
-  public abstract @Nullable String getSecretId();
+  public abstract String getSecretId();
   public abstract @Nullable String getDescription();
   public abstract @Nullable String getSecretValue();
   public abstract ImmutableList<Role> getRoles();

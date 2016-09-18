@@ -6,10 +6,17 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.jboss.resteasy.plugins.guice.GuiceResteasyBootstrapServletContextListener;
 import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.guava.GuavaModule;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.collect.ImmutableList;
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+
+import io.github.spharris.stash.service.StashServiceModule;
 
 /**
  * Server starter for secret-stash 
@@ -33,6 +40,18 @@ public final class SecretStash {
   }
   
   private static ImmutableList<Module> getModules() {
-    return ImmutableList.of();
+    return ImmutableList.of(
+      new StashServiceModule(),
+      new StashServerModule(),
+      new AbstractModule() {
+        @Override
+        protected void configure() {
+          ObjectMapper mapper = new ObjectMapper()
+              .setSerializationInclusion(Include.NON_NULL)
+              .registerModule(new GuavaModule());
+          
+          bind(JacksonJsonProvider.class).toInstance(new JacksonJsonProvider(mapper));
+        }
+      });
   }
 }

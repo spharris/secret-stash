@@ -13,20 +13,19 @@ import com.google.common.collect.ImmutableList;
 
 import io.github.spharris.stash.Environment;
 
-@Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-class EnvironmentController {
+public final class EnvironmentController {
   
   @GET
-  @Path("{projectId}")
+  @Path("/projects/{projectId}/environments")
   public Response<ImmutableList<Environment>> listEnvironments(
       @PathParam("projectId") String projectId) {
     return Response.<ImmutableList<Environment>>builder().build();
   }
   
   @PUT
-  @Path("{projectId}")
+  @Path("/projects/{projectId}/environments")
   public Response<Environment> createEnvironment(
       @PathParam("projectId") String projectId,
       Environment environment) {
@@ -34,7 +33,7 @@ class EnvironmentController {
   }
   
   @GET
-  @Path("{projectId}/{environmentId}")
+  @Path("/projects/{projectId}/environments/{environmentId}")
   public Response<Environment> getEnvironment(
       @PathParam("projectId") String projectId,
       @PathParam("environmentId") String environmentId) {
@@ -42,7 +41,7 @@ class EnvironmentController {
   }
   
   @PUT
-  @Path("{projectId}/{environmentId}")
+  @Path("/projects/{projectId}/environments/{environmentId}")
   public Response<Environment> updateEnvironment(
       @PathParam("projectId") String projectId,
       @PathParam("environmentId") String environmentId,
@@ -51,7 +50,7 @@ class EnvironmentController {
   }
   
   @DELETE
-  @Path("{projectId}/{environmentId}")
+  @Path("/projects/{projectId}/environments/{environmentId}")
   public Response<Void> deleteEnvironment(
       @PathParam("projectId") String projectId,
       @PathParam("environmentId") String environmentId) {

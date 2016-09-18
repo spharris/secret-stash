@@ -13,37 +13,38 @@ import com.google.common.collect.ImmutableList;
 
 import io.github.spharris.stash.Project;
 
-@Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-class ProjectController {
+public final class ProjectController {
   
   @GET
+  @Path("/projects")
   public Response<ImmutableList<Project>> listProjects() {
     return Response.<ImmutableList<Project>>builder().build();
   }
   
   @PUT
+  @Path("/projects")
   public Response<Project> createProject(Project secret) {
     return Response.<Project>builder().build();
   }
   
   @GET
-  @Path("{projectId}")
+  @Path("/projects/{projectId}")
   public Response<Project> getProject(
       @PathParam("projectId") String projectId) {
     return Response.<Project>builder().build();
   }
   
   @PUT
-  @Path("{projectId}")
+  @Path("/projects/{projectId}")
   public Response<Project> updateProject(
       @PathParam("projectId") String projectId, Project secret) {
     return Response.<Project>builder().build();
   }
   
   @DELETE
-  @Path("{projectId}")
+  @Path("/projects/{projectId}")
   public Response<Void> deleteProject(
       @PathParam("projectId") String projectId) {
     return Response.<Void>builder().build();
