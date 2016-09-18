@@ -1,5 +1,6 @@
 package io.github.spharris.stash.server;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -12,11 +13,19 @@ import javax.ws.rs.core.MediaType;
 import com.google.common.collect.ImmutableList;
 
 import io.github.spharris.stash.Project;
+import io.github.spharris.stash.service.ProjectService;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public final class ProjectController {
+  
+  private final ProjectService projectService;
+  
+  @Inject
+  ProjectController(ProjectService projectService) {
+    this.projectService = projectService;
+  }
   
   @GET
   @Path("/projects")

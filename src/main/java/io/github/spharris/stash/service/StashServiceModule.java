@@ -6,7 +6,7 @@ import com.google.inject.AbstractModule;
  * secret-stash backend services
  */
 public class StashServiceModule extends AbstractModule {
-
+  
   @Override
   protected void configure() {
     bind(ProjectService.class).to(ProjectServiceImpl.class);
