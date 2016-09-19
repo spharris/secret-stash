@@ -112,7 +112,7 @@ import com.amazonaws.services.s3.waiters.AmazonS3Waiters;
 import com.google.common.io.ByteStreams;
 
 /**
- * Fake S3 client used for testing. Implements a VERY limited subset of all S3 functionality 
+ * Fake S3 client used for testing. Implements a VERY limited subset of S3 functionality
  */
 public class FakeS3Client implements AmazonS3 {
 
@@ -483,13 +483,13 @@ public class FakeS3Client implements AmazonS3 {
   @Override
   public S3Object getObject(GetObjectRequest request)
       throws AmazonClientException, AmazonServiceException {
-    throw new UnsupportedOperationException();
+    return data.get(makePath(request.getBucketName(), request.getKey()));
   }
 
   @Override
   public S3Object getObject(String bucketName, String key)
       throws AmazonClientException, AmazonServiceException {
-    throw new UnsupportedOperationException();
+    return getObject(new GetObjectRequest(bucketName, key));
   }
 
   @Override
@@ -725,7 +725,7 @@ public class FakeS3Client implements AmazonS3 {
   public PutObjectResult putObject(String bucketName, String key, InputStream input,
       ObjectMetadata metadata)
       throws AmazonClientException, AmazonServiceException {
-    throw new UnsupportedOperationException();
+     return putObject(new PutObjectRequest(bucketName, key, input, metadata));
   }
 
   @Override

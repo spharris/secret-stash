@@ -8,11 +8,11 @@ import javax.inject.Qualifier;
 /**
  * Annotations used for Guice configuration 
  */
-class Annotations {
+public class Annotations {
 
   private Annotations() {}
   
   @Qualifier
   @Retention(RetentionPolicy.RUNTIME)
-  @interface BucketOfSecrets {}
+  public @interface BucketOfSecrets {}
 }

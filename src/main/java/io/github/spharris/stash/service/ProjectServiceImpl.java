@@ -3,6 +3,8 @@ package io.github.spharris.stash.service;
 import javax.inject.Inject;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 
 import io.github.spharris.stash.Project;
@@ -17,11 +19,13 @@ public class ProjectServiceImpl implements ProjectService {
 
   private final String bucketName;
   private final AmazonS3 s3client;
+  private final ObjectMapper mapper;
   
   @Inject
-  ProjectServiceImpl(@BucketOfSecrets String bucketName, AmazonS3 s3client) {
+  ProjectServiceImpl(@BucketOfSecrets String bucketName, AmazonS3 s3client, ObjectMapper mapper) {
     this.bucketName = bucketName;
     this.s3client = s3client;
+    this.mapper = mapper;
   }
   
   @Override
@@ -32,8 +36,16 @@ public class ProjectServiceImpl implements ProjectService {
 
   @Override
   public Project createProject(CreateProjectRequest request) {
-    // TODO Auto-generated method stub
-    return null;
+    Project project = request.getProject();
+    
+    try {
+      s3client.putObject(bucketName, ObjectNameUtil.createS3Path(project.getProjectId()),
+        mapper.writeValueAsString(project));
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+    
+    return project;
   }
 
   @Override
@@ -53,5 +65,4 @@ public class ProjectServiceImpl implements ProjectService {
     // TODO Auto-generated method stub
 
   }
-
 }
