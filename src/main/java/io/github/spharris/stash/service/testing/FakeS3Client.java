@@ -1,8 +1,13 @@
 package io.github.spharris.stash.service.testing;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -104,13 +109,14 @@ import com.amazonaws.services.s3.model.UploadPartRequest;
 import com.amazonaws.services.s3.model.UploadPartResult;
 import com.amazonaws.services.s3.model.VersionListing;
 import com.amazonaws.services.s3.waiters.AmazonS3Waiters;
+import com.google.common.io.ByteStreams;
 
 /**
  * Fake S3 client used for testing. Implements a VERY limited subset of all S3 functionality 
  */
 public class FakeS3Client implements AmazonS3 {
 
-  private Map<String, String> data;
+  private Map<String, S3Object> data;
   
   public FakeS3Client() {
     data = new HashMap<>();
@@ -678,9 +684,28 @@ public class FakeS3Client implements AmazonS3 {
   }
 
   @Override
+  @SuppressWarnings("resource")
   public PutObjectResult putObject(PutObjectRequest request)
       throws AmazonClientException, AmazonServiceException {
-    throw new UnsupportedOperationException();
+    S3Object object = new S3Object();
+    object.setBucketName(checkNotNull(request.getBucketName()));
+    object.setKey(checkNotNull(request.getKey()));
+    object.setObjectMetadata(checkNotNull(request.getMetadata()));
+    
+    try {
+      object.setObjectContent(new ByteArrayInputStream(
+        ByteStreams.toByteArray(request.getInputStream())));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    
+    data.put(makePath(request.getBucketName(), request.getKey()), object);
+    
+    ObjectMetadata meta = request.getMetadata();
+    PutObjectResult result = new PutObjectResult();
+    result.setMetadata(meta);
+    
+    return result;
   }
 
   @Override
@@ -692,7 +717,8 @@ public class FakeS3Client implements AmazonS3 {
   @Override
   public PutObjectResult putObject(String bucketName, String key, String content)
       throws AmazonServiceException, AmazonClientException {
-    throw new UnsupportedOperationException();
+    return putObject(new PutObjectRequest(bucketName, key,
+      new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)), new ObjectMetadata()));
   }
 
   @Override
@@ -894,4 +920,7 @@ public class FakeS3Client implements AmazonS3 {
     throw new UnsupportedOperationException();
   }
 
+  private static String makePath(String bucket, String key) {
+    return String.format("%s:%s", bucket, key);
+  }
 }
