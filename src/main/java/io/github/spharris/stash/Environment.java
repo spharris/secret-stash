@@ -18,8 +18,7 @@ public abstract class Environment {
   
   public abstract Builder toBuilder();
   public static Builder builder() {
-    return new AutoValue_Environment.Builder()
-        .setAcl(AccessControlList.builder().build());
+    return new AutoValue_Environment.Builder();
   }
   
   @AutoValue.Builder
@@ -30,7 +29,12 @@ public abstract class Environment {
     public abstract Builder setDescription(String description);
     public abstract Builder setAcl(AccessControlList acl);
     
-    public abstract Environment build();
+    protected abstract Environment autoBuild();
+    public Environment build() {
+      // Do this here instead of in builder() above so that Jackson doesn't barf
+      setAcl(AccessControlList.builder().build());
+      return autoBuild();
+    }
   }
 
 }

@@ -3,6 +3,7 @@ package io.github.spharris.stash.service.testing;
 import io.github.spharris.stash.AccessControlList;
 import io.github.spharris.stash.Environment;
 import io.github.spharris.stash.Project;
+import io.github.spharris.stash.Secret;
 
 /**
  * Entities used in test cases
@@ -47,4 +48,12 @@ public class TestEntities {
    * Secret-related entities
    */
   public static final String TEST_SECRET_ID = "test-secret";
+  public static final String TEST_SECRET_DESCRIPTION = "test-secret-description";
+  public static final String TEST_SECRET_VALUE = "test-secret-value";
+  
+  public static final Secret TEST_SECRET = Secret.builder()
+      .setSecretId(TEST_SECRET_ID)
+      .setDescription(TEST_SECRET_DESCRIPTION)
+      .setSecretValue(TEST_SECRET_VALUE)
+      .build();
 }

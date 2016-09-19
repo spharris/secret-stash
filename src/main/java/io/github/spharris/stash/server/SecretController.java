@@ -1,5 +1,6 @@
 package io.github.spharris.stash.server;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -12,11 +13,20 @@ import javax.ws.rs.core.MediaType;
 import com.google.common.collect.ImmutableList;
 
 import io.github.spharris.stash.Secret;
+import io.github.spharris.stash.service.SecretService;
+import io.github.spharris.stash.service.request.CreateSecretRequest;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public final class SecretController {
+  
+  private final SecretService secretService;
+  
+  @Inject
+  SecretController(SecretService secretService) {
+    this.secretService = secretService;
+  }
   
   @GET
   @Path("/projects/{projectId}/environments/{environmentId}/secrets")
@@ -32,7 +42,13 @@ public final class SecretController {
       @PathParam("projectId") String projectId,
       @PathParam("environmentId") String environmentId,
       Secret secret) {
-    return Response.<Secret>builder().build();
+    return Response.<Secret>builder()
+        .setValue(secretService.createSecret(CreateSecretRequest.builder()
+          .setProjectId(projectId)
+          .setEnvironmentId(environmentId)
+          .setSecret(secret)
+          .build()))
+        .build();
   }
   
   @GET

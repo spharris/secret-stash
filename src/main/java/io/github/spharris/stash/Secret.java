@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-@JsonDeserialize(builder = AutoValue_Environment.Builder.class)
+@JsonDeserialize(builder = AutoValue_Secret.Builder.class)
 public abstract class Secret {
   
   Secret() {}
