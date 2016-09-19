@@ -1,5 +1,7 @@
 package io.github.spharris.stash;
 
+import javax.annotation.Nullable;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
@@ -14,8 +16,9 @@ public abstract class Project {
   Project() {}
   
   public abstract String getProjectId();
-  public abstract String getDescription();
+  public abstract @Nullable String getDescription();
   
+  public abstract Project.Builder toBuilder();
   public static Builder builder() {
     return new AutoValue_Project.Builder();
   }
