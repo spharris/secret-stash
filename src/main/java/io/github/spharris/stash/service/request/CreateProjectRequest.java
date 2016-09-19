@@ -9,6 +9,7 @@ public abstract class CreateProjectRequest {
   
   public abstract Project getProject();
   
+  public abstract Builder toBuilder();
   public static Builder builder() {
     return new AutoValue_CreateProjectRequest.Builder();
   }

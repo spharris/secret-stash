@@ -18,7 +18,7 @@ public abstract class Project {
   public abstract String getProjectId();
   public abstract @Nullable String getDescription();
   
-  public abstract Project.Builder toBuilder();
+  public abstract Builder toBuilder();
   public static Builder builder() {
     return new AutoValue_Project.Builder();
   }

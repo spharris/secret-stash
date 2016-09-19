@@ -7,7 +7,7 @@ import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.junit.runners.JUnit4;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +18,7 @@ import io.github.spharris.stash.service.request.CreateProjectRequest;
 import io.github.spharris.stash.service.testing.TestEntities;
 import io.github.spharris.stash.service.testing.TestModule;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(JUnit4.class)
 public class ProjectServiceImplTest {
 
   @Inject ObjectMapper mapper;

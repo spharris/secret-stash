@@ -16,7 +16,7 @@ public abstract class Environment {
   public abstract @Nullable String getDescription();
   public abstract AccessControlList getAcl();
   
-  public abstract Environment.Builder toBuilder();
+  public abstract Builder toBuilder();
   public static Builder builder() {
     return new AutoValue_Environment.Builder()
         .setAcl(AccessControlList.builder().build());

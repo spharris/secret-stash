@@ -1,7 +1,5 @@
 package io.github.spharris.stash;
 
-import com.amazonaws.services.identitymanagement.model.Group;
-import com.amazonaws.services.identitymanagement.model.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
@@ -14,10 +12,10 @@ public abstract class AccessControlList {
   
   AccessControlList() {}
   
-  public abstract ImmutableList<Role> getRoles();
-  public abstract ImmutableList<Group> getGroups();
+  public abstract ImmutableList<String> getRoles();
+  public abstract ImmutableList<String> getGroups();
   
-  public abstract AccessControlList.Builder toBuilder();
+  public abstract Builder toBuilder();
   public static Builder builder() {
     return new AutoValue_AccessControlList.Builder()
         .setRoles(ImmutableList.of())
@@ -28,11 +26,11 @@ public abstract class AccessControlList {
   @JsonPOJOBuilder(buildMethodName = "build", withPrefix = "set")
   public abstract static class Builder {
     
-    public abstract Builder setRoles(Role... roles);
-    public abstract Builder setGroups(Group... groups);
+    public abstract Builder setRoles(String... roles);
+    public abstract Builder setGroups(String... groups);
     
-    @JsonProperty("roles") public abstract Builder setRoles(ImmutableList<Role> roles);
-    @JsonProperty("groups") public abstract Builder setGroups(ImmutableList<Group> groups);
+    @JsonProperty("roles") public abstract Builder setRoles(ImmutableList<String> roles);
+    @JsonProperty("groups") public abstract Builder setGroups(ImmutableList<String> groups);
     
     public abstract AccessControlList build();
   }
