@@ -122,13 +122,14 @@ public class FakeS3Client implements AmazonS3 {
     data = new HashMap<>();
   }
   
-  @Override
+  @Override 
   public void abortMultipartUpload(AbortMultipartUploadRequest arg0)
       throws AmazonClientException, AmazonServiceException {
     throw new UnsupportedOperationException();
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void changeObjectStorageClass(String arg0, String arg1, StorageClass arg2)
       throws AmazonClientException, AmazonServiceException {
     throw new UnsupportedOperationException();
@@ -894,6 +895,7 @@ public class FakeS3Client implements AmazonS3 {
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void setObjectRedirectLocation(String arg0, String arg1, String arg2)
       throws AmazonClientException, AmazonServiceException {
     throw new UnsupportedOperationException();

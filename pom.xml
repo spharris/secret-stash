@@ -11,7 +11,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<build>
-		<sourceDirectory>src</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -25,6 +24,9 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.5.1</version>
 				<configuration>
+					<compilerArgs>
+						<arg>-Xlint:deprecation</arg>
+					</compilerArgs>
 					<source>1.8</source>
 					<target>1.8</target>
 				</configuration>
@@ -44,6 +46,11 @@
 				<version>1.11.35</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>4.5.2</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -99,7 +106,7 @@
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-jaxrs</artifactId>
-			<version>3.0.14.Final</version>
+			<version>3.0.19.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>

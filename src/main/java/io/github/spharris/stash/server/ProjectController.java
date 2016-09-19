@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableList;
 
 import io.github.spharris.stash.Project;
 import io.github.spharris.stash.service.ProjectService;
+import io.github.spharris.stash.service.request.CreateProjectRequest;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -35,8 +36,12 @@ public final class ProjectController {
   
   @PUT
   @Path("/projects")
-  public Response<Project> createProject(Project secret) {
-    return Response.<Project>builder().build();
+  public Response<Project> createProject(Project project) {
+    return Response.<Project>builder()
+        .setValue(projectService.createProject(CreateProjectRequest.builder()
+          .setProject(project)
+          .build()))
+        .build();
   }
   
   @GET
