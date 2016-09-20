@@ -39,11 +39,10 @@ public class ProjectServiceImpl implements ProjectService {
     
     return ImmutableList.copyOf(result.getObjectSummaries().parallelStream()
       .map((summary) -> { return summary.getKey(); })
-      .filter((key) -> { return key.split("/").length == 1; })
-      .filter((key) -> { return key.endsWith("/"); })
+      .filter(ObjectNameUtil.isProjectKey())
       .map((key) -> { 
         return Project.builder()
-          .setProjectId(key.substring(0, key.length() - 1))
+          .setProjectId(ObjectNameUtil.extractProjectId(key))
           .build();
       })
       .collect(Collectors.toList()));
