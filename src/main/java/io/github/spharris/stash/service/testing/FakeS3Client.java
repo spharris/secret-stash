@@ -1,6 +1,8 @@
 package io.github.spharris.stash.service.testing;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -8,10 +10,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
@@ -92,6 +99,7 @@ import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.services.s3.model.Region;
 import com.amazonaws.services.s3.model.RestoreObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.services.s3.model.SetBucketAccelerateConfigurationRequest;
 import com.amazonaws.services.s3.model.SetBucketAclRequest;
 import com.amazonaws.services.s3.model.SetBucketCrossOriginConfigurationRequest;
@@ -639,21 +647,66 @@ public class FakeS3Client implements AmazonS3 {
   }
 
   @Override
-  public ListObjectsV2Result listObjectsV2(String arg0)
+  public ListObjectsV2Result listObjectsV2(String bucketName)
       throws AmazonClientException, AmazonServiceException {
-    throw new UnsupportedOperationException();
+    ListObjectsV2Request request = new ListObjectsV2Request();
+    request.setBucketName(bucketName);
+    return listObjectsV2(request);
   }
 
   @Override
-  public ListObjectsV2Result listObjectsV2(ListObjectsV2Request arg0)
+  public ListObjectsV2Result listObjectsV2(ListObjectsV2Request request)
       throws AmazonClientException, AmazonServiceException {
-    throw new UnsupportedOperationException();
+    
+    // If delimter is set, this may include objects that should not be included
+    // in the final list
+    List<S3ObjectSummary> unfilteredSummaries = data.values().stream()
+        .filter((object) -> object.getBucketName().equals(request.getBucketName()))
+        .filter((object) -> {
+          return request.getPrefix() == null || object.getKey().startsWith(request.getPrefix());
+        })
+        .map(createObjectSummary)
+        .sorted((left, right) -> { return left.getKey().compareTo(right.getKey()); })
+        .collect(Collectors.toList());
+    
+    Set<String> commonPrefixes = new HashSet<>();
+    List<S3ObjectSummary> summaries = new ArrayList<>();
+    if (request.getPrefix() != null && request.getDelimiter() != null) {
+      for (S3ObjectSummary summary : unfilteredSummaries) {
+        String key = summary.getKey();
+        String prefix = request.getPrefix();
+        String delim = request.getDelimiter();
+        
+        int nextDelim = key.indexOf(delim, prefix.length());
+        if (nextDelim == -1) {
+          summaries.add(summary);
+          continue;
+        }
+        
+        commonPrefixes.add(key.substring(0, nextDelim + 1));
+      }
+    } else {
+      summaries = unfilteredSummaries;
+    }
+    
+    // For some reason you can't set object summaries on this thing
+    ListObjectsV2Result result = mock(ListObjectsV2Result.class);
+    when(result.getBucketName()).thenReturn(request.getBucketName());
+    when(result.getKeyCount()).thenReturn(summaries.size());
+    when(result.getObjectSummaries()).thenReturn(summaries);
+    when(result.getCommonPrefixes()).thenReturn(
+      commonPrefixes.stream().sorted().collect(Collectors.toList()));
+    
+    return result;
   }
 
   @Override
-  public ListObjectsV2Result listObjectsV2(String arg0, String arg1)
+  public ListObjectsV2Result listObjectsV2(String bucketName, String prefix)
       throws AmazonClientException, AmazonServiceException {
-    throw new UnsupportedOperationException();
+    ListObjectsV2Request request = new ListObjectsV2Request();
+    request.setBucketName(bucketName);
+    request.setPrefix(prefix);
+    return listObjectsV2(request);
   }
 
   @Override
@@ -925,4 +978,17 @@ public class FakeS3Client implements AmazonS3 {
   private static String makePath(String bucket, String key) {
     return String.format("%s:%s", bucket, key);
   }
+  
+  private static final Function<S3Object, S3ObjectSummary> createObjectSummary =
+      new Function<S3Object, S3ObjectSummary>() {
+
+        @Override
+        public S3ObjectSummary apply(S3Object t) {
+          S3ObjectSummary summary = new S3ObjectSummary();
+          summary.setBucketName(t.getBucketName());
+          summary.setKey(t.getKey());
+
+          return summary;
+        }
+  };
 }

@@ -1,8 +1,11 @@
 package io.github.spharris.stash.service;
 
+import java.io.ByteArrayInputStream;
+
 import javax.inject.Inject;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
@@ -38,19 +41,22 @@ public class SecretServiceImpl implements SecretService {
   @Override
   public Secret createSecret(CreateSecretRequest request) {
     // TODO(spharris): Case where project/environment don't exist
-    Secret secret = request.getSecret();
+    ObjectMetadata meta = new ObjectMetadata();
+    meta.setSSEAlgorithm(ObjectMetadata.AES_256_SERVER_SIDE_ENCRYPTION);
     
     try {
-      s3client.putObject(bucketName, ObjectNameUtil.createS3Path(
-        request.getProjectId(),
-        request.getEnvironmentId(),
-        request.getSecret().getSecretId()),
-        mapper.writeValueAsString(secret));
+       s3client.putObject(bucketName, ObjectNameUtil.createS3Path(
+         request.getProjectId(),
+         request.getEnvironmentId(),
+         request.getSecret().getSecretId()),
+         new ByteArrayInputStream(
+           mapper.writeValueAsBytes(request.getSecret())),
+         meta);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
     
-    return secret;
+    return request.getSecret();
   }
 
   @Override
