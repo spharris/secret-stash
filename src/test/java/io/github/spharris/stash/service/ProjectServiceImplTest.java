@@ -11,10 +11,13 @@ import org.junit.runners.JUnit4;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Guice;
 
 import io.github.spharris.stash.Project;
 import io.github.spharris.stash.service.request.CreateProjectRequest;
+import io.github.spharris.stash.service.request.GetProjectRequest;
+import io.github.spharris.stash.service.request.ListProjectsRequest;
 import io.github.spharris.stash.service.testing.TestEntities;
 import io.github.spharris.stash.service.testing.TestModule;
 
@@ -51,5 +54,72 @@ public class ProjectServiceImplTest {
       ObjectNameUtil.createS3Path(TestEntities.TEST_PROJECT_ID)).getObjectContent(), Project.class);
     
     assertThat(result).isEqualTo(TestEntities.TEST_PROJECT);
+  }
+  
+  @Test
+  public void listsWhenJustProjects() {
+    int projectCount = 10;
+    createProjects(projectCount);
+    
+    ImmutableList<Project> projects = projectService.listProjects(
+      ListProjectsRequest.builder().build());
+    
+    assertThat(projects).hasSize(projectCount);
+    for (int i = 0; i < projectCount; i++) {
+      assertThat(projects.get(i).getProjectId()).isEqualTo("project-" + i);
+    }
+  }
+  
+  @Test
+  public void filtersOutRandomFiles() {
+    int projectCount = 10;
+    createProjects(projectCount);
+    client.putObject(TestEntities.TEST_BUCKET, "derp.js", "data");
+    
+    ImmutableList<Project> projects = projectService.listProjects(
+      ListProjectsRequest.builder().build());
+    
+    assertThat(projects).hasSize(projectCount);
+    for (int i = 0; i < projectCount; i++) {
+      assertThat(projects.get(i).getProjectId()).isEqualTo("project-" + i);
+    }
+  }
+  
+  @Test
+  public void listsWhenMoreThanProjects() {
+    int projectCount = 10;
+    createProjects(projectCount);
+    
+    client.putObject(TestEntities.TEST_BUCKET, "project-1/test/", "data");
+    client.putObject(TestEntities.TEST_BUCKET, "project-1/test/test-key", "data");
+    
+    ImmutableList<Project> projects = projectService.listProjects(
+      ListProjectsRequest.builder().build());
+    
+    assertThat(projects).hasSize(projectCount);
+    for (int i = 0; i < projectCount; i++) {
+      assertThat(projects.get(i).getProjectId()).isEqualTo("project-" + i);
+    }
+  }
+  
+  @Test
+  public void getsProject() {
+    projectService.createProject(CreateProjectRequest.builder()
+      .setProject(TestEntities.TEST_PROJECT)
+      .build());
+    
+    assertThat(projectService.getProject(GetProjectRequest.builder()
+      .setProjectId(TestEntities.TEST_PROJECT_ID)
+      .build())).isEqualTo(TestEntities.TEST_PROJECT);
+  }
+  
+  private void createProjects(int count) {
+    for (int i = 0; i < count; i++) {
+      projectService.createProject(CreateProjectRequest.builder()
+        .setProject(Project.builder()
+          .setProjectId("project-" + i)
+          .build())
+        .build());
+    }
   }
 }

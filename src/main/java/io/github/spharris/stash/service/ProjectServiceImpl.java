@@ -1,8 +1,13 @@
 package io.github.spharris.stash.service;
 
+import java.io.IOException;
+import java.util.stream.Collectors;
+
 import javax.inject.Inject;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ListObjectsV2Result;
+import com.amazonaws.services.s3.model.S3Object;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
@@ -30,8 +35,18 @@ public class ProjectServiceImpl implements ProjectService {
   
   @Override
   public ImmutableList<Project> listProjects(ListProjectsRequest request) {
-    // TODO Auto-generated method stub
-    return null;
+    ListObjectsV2Result result = s3client.listObjectsV2(bucketName);
+    
+    return ImmutableList.copyOf(result.getObjectSummaries().parallelStream()
+      .map((summary) -> { return summary.getKey(); })
+      .filter((key) -> { return key.split("/").length == 1; })
+      .filter((key) -> { return key.endsWith("/"); })
+      .map((key) -> { 
+        return Project.builder()
+          .setProjectId(key.substring(0, key.length() - 1))
+          .build();
+      })
+      .collect(Collectors.toList()));
   }
 
   @Override
@@ -50,8 +65,14 @@ public class ProjectServiceImpl implements ProjectService {
 
   @Override
   public Project getProject(GetProjectRequest request) {
-    // TODO Auto-generated method stub
-    return null;
+    S3Object result = s3client.getObject(bucketName, ObjectNameUtil.createS3Path(
+      request.getProjectId()));
+    
+    try {
+      return mapper.readValue(result.getObjectContent(), Project.class);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override

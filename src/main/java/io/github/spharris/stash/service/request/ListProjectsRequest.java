@@ -1,5 +1,7 @@
 package io.github.spharris.stash.service.request;
 
+import javax.annotation.Nullable;
+
 import com.google.auto.value.AutoValue;
 
 @AutoValue
@@ -7,7 +9,7 @@ public abstract class ListProjectsRequest {
   
   ListProjectsRequest() {}
   
-  public abstract String getContinuationToken();
+  public abstract @Nullable String getContinuationToken();
   
   public abstract Builder toBuilder();
   public static Builder builder() {
