@@ -17,6 +17,7 @@ import io.github.spharris.stash.service.request.DeleteSecretRequest;
 import io.github.spharris.stash.service.request.GetSecretRequest;
 import io.github.spharris.stash.service.request.ListSecretsRequest;
 import io.github.spharris.stash.service.request.UpdateSecretRequest;
+import io.github.spharris.stash.service.utils.ObjectNameUtil;
 
 public class SecretServiceImpl implements SecretService {
 

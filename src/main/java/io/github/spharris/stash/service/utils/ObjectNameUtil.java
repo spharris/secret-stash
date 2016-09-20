@@ -1,4 +1,4 @@
-package io.github.spharris.stash.service;
+package io.github.spharris.stash.service.utils;
 
 import java.util.function.Predicate;
 

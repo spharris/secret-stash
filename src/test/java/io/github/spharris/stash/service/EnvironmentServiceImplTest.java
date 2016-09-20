@@ -17,6 +17,7 @@ import io.github.spharris.stash.Environment;
 import io.github.spharris.stash.service.request.CreateEnvironmentRequest;
 import io.github.spharris.stash.service.testing.TestEntities;
 import io.github.spharris.stash.service.testing.TestModule;
+import io.github.spharris.stash.service.utils.ObjectNameUtil;
 
 @RunWith(JUnit4.class)
 public class EnvironmentServiceImplTest {

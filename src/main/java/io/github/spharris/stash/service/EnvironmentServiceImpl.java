@@ -14,6 +14,7 @@ import io.github.spharris.stash.service.request.DeleteEnvironmentRequest;
 import io.github.spharris.stash.service.request.GetEnvironmentRequest;
 import io.github.spharris.stash.service.request.ListEnvironmentsRequest;
 import io.github.spharris.stash.service.request.UpdateEnvironmentRequest;
+import io.github.spharris.stash.service.utils.ObjectNameUtil;
 
 public class EnvironmentServiceImpl implements EnvironmentService {
 

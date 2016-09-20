@@ -18,6 +18,7 @@ import io.github.spharris.stash.Secret;
 import io.github.spharris.stash.service.request.CreateSecretRequest;
 import io.github.spharris.stash.service.testing.TestEntities;
 import io.github.spharris.stash.service.testing.TestModule;
+import io.github.spharris.stash.service.utils.ObjectNameUtil;
 
 @RunWith(JUnit4.class)
 public class SecretServiceImplTest {

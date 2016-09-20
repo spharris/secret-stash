@@ -19,6 +19,7 @@ import io.github.spharris.stash.service.request.DeleteProjectRequest;
 import io.github.spharris.stash.service.request.GetProjectRequest;
 import io.github.spharris.stash.service.request.ListProjectsRequest;
 import io.github.spharris.stash.service.request.UpdateProjectRequest;
+import io.github.spharris.stash.service.utils.ObjectNameUtil;
 
 public class ProjectServiceImpl implements ProjectService {
 

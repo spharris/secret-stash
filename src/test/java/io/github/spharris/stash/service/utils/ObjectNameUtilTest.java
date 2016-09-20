@@ -1,4 +1,4 @@
-package io.github.spharris.stash.service;
+package io.github.spharris.stash.service.utils;
 
 import static com.google.common.truth.Truth.assertThat;
 
