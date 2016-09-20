@@ -154,6 +154,32 @@ public class FakeS3ClientTest {
     }
   }
   
+  @Test
+  public void putsBucketPolicy() {
+    String policy = "policy";
+    
+    client.setBucketPolicy(TEST_BUCKET, policy);
+    
+    assertThat(client.getBucketPolicy(TEST_BUCKET).getPolicyText()).isEqualTo(policy);
+  }
+  
+  @Test
+  public void returnsNullPolicy() {
+    client.getBucketPolicy(TEST_BUCKET);
+    
+    assertThat(client.getBucketPolicy(TEST_BUCKET).getPolicyText()).isNull();
+  }
+  
+  @Test
+  public void deletesBucketPolicy() {
+    String policy = "policy";
+    
+    client.setBucketPolicy(TEST_BUCKET, policy);
+    client.deleteBucketPolicy(TEST_BUCKET);
+    
+    assertThat(client.getBucketPolicy(TEST_BUCKET).getPolicyText()).isNull();
+  }
+  
   private void addObjects(int count) {
     for (int i = 0; i < count; i++) {
       client.putObject(TEST_BUCKET, String.valueOf(i), String.valueOf(i));
@@ -165,4 +191,6 @@ public class FakeS3ClientTest {
       client.putObject(TEST_BUCKET, prefix + String.valueOf(i), String.valueOf(i));
     }
   }
+  
+  
 }

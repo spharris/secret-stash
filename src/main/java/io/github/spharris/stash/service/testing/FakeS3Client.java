@@ -24,6 +24,7 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.AmazonWebServiceRequest;
 import com.amazonaws.HttpMethod;
+import com.amazonaws.auth.policy.Policy;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.S3ClientOptions;
 import com.amazonaws.services.s3.S3ResponseMetadata;
@@ -125,9 +126,11 @@ import com.google.common.io.ByteStreams;
 public class FakeS3Client implements AmazonS3 {
 
   private Map<String, S3Object> data;
+  private Map<String, BucketPolicy> policies;
   
   public FakeS3Client() {
     data = new HashMap<>();
+    policies = new HashMap<>();
   }
   
   @Override 
@@ -223,14 +226,14 @@ public class FakeS3Client implements AmazonS3 {
   }
 
   @Override
-  public void deleteBucketPolicy(String arg0) throws AmazonClientException, AmazonServiceException {
-    throw new UnsupportedOperationException();
+  public void deleteBucketPolicy(String bucketName) throws AmazonClientException, AmazonServiceException {
+    deleteBucketPolicy(new DeleteBucketPolicyRequest(bucketName));
   }
 
   @Override
-  public void deleteBucketPolicy(DeleteBucketPolicyRequest arg0)
+  public void deleteBucketPolicy(DeleteBucketPolicyRequest request)
       throws AmazonClientException, AmazonServiceException {
-    throw new UnsupportedOperationException();
+    policies.remove(request.getBucketName());
   }
 
   @Override
@@ -423,15 +426,15 @@ public class FakeS3Client implements AmazonS3 {
   }
 
   @Override
-  public BucketPolicy getBucketPolicy(String arg0)
+  public BucketPolicy getBucketPolicy(String bucketName)
       throws AmazonClientException, AmazonServiceException {
-    throw new UnsupportedOperationException();
+    return getBucketPolicy(new GetBucketPolicyRequest(bucketName));
   }
 
   @Override
-  public BucketPolicy getBucketPolicy(GetBucketPolicyRequest arg0)
+  public BucketPolicy getBucketPolicy(GetBucketPolicyRequest request)
       throws AmazonClientException, AmazonServiceException {
-    throw new UnsupportedOperationException();
+    return policies.getOrDefault(request.getBucketName(), new BucketPolicy());
   }
 
   @Override
@@ -861,15 +864,17 @@ public class FakeS3Client implements AmazonS3 {
   }
 
   @Override
-  public void setBucketPolicy(SetBucketPolicyRequest arg0)
+  public void setBucketPolicy(SetBucketPolicyRequest request)
       throws AmazonClientException, AmazonServiceException {
-    throw new UnsupportedOperationException();
+    BucketPolicy policy = new BucketPolicy();
+    policy.setPolicyText(request.getPolicyText());
+    policies.put(request.getBucketName(), policy);
   }
 
   @Override
-  public void setBucketPolicy(String arg0, String arg1)
+  public void setBucketPolicy(String bucketName, String policyText)
       throws AmazonClientException, AmazonServiceException {
-    throw new UnsupportedOperationException();
+    setBucketPolicy(new SetBucketPolicyRequest(bucketName, policyText));
   }
 
   @Override

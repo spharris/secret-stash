@@ -24,7 +24,7 @@ public class ObjectNameUtilTest {
       TestEntities.TEST_ENVIRONMENT_ID))
       .isEqualTo(TestEntities.TEST_PROJECT_ID + "/" + TestEntities.TEST_ENVIRONMENT_ID + "/");
   }
-  
+   
   @Test
   public void createsSecretName() {
     assertThat(ObjectNameUtil.createS3Path(

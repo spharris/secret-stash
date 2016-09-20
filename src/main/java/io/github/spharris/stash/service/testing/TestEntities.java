@@ -56,4 +56,9 @@ public class TestEntities {
       .setDescription(TEST_SECRET_DESCRIPTION)
       .setSecretValue(TEST_SECRET_VALUE)
       .build();
+  
+  /*
+   * Policy-related entities
+   */
+  public static final String TEST_POLICY_PREFIX = "test-policy-prefix";
 }

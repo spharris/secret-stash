@@ -15,4 +15,8 @@ public class Annotations {
   @Qualifier
   @Retention(RetentionPolicy.RUNTIME)
   public @interface BucketOfSecrets {}
+  
+  @Qualifier
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface PolicyPrefix {}
 }
