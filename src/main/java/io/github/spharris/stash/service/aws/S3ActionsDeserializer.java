@@ -12,7 +12,10 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
-public class S3ActionsDeserializer extends JsonDeserializer<S3Actions> {
+/**
+ * Deserializer for S3Actions
+ */
+class S3ActionsDeserializer extends JsonDeserializer<S3Actions> {
 
   private static final ImmutableMap<String, S3Actions> ACTION_MAP = ImmutableMap.copyOf(
     Maps.uniqueIndex(

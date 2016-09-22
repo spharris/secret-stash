@@ -12,7 +12,7 @@ import com.google.common.collect.ImmutableMultimap;
 /**
  * Deserializer for a statement's "Principal" field.
  */
-public class PrincipalDeserializer extends JsonDeserializer<ImmutableMultimap<String, String>> {
+class PrincipalDeserializer extends JsonDeserializer<ImmutableMultimap<String, String>> {
 
   ImmutableMultimapDeserializer multimapDeserializer = new ImmutableMultimapDeserializer();
   

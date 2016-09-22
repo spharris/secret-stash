@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 
-public class ConditionDeserializer extends
+class ConditionDeserializer extends
     JsonDeserializer<ImmutableMap<String, ImmutableMultimap<String, String>>> {
 
   ImmutableMultimapDeserializer multimapDeserializer = new ImmutableMultimapDeserializer();

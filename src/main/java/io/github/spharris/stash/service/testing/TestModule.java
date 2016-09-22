@@ -10,6 +10,7 @@ import com.google.inject.Key;
 
 import io.github.spharris.stash.service.Annotations.BucketOfSecrets;
 import io.github.spharris.stash.service.Annotations.PolicyPrefix;
+import io.github.spharris.stash.service.utils.JsonUtil;
 import io.github.spharris.stash.service.EnvironmentService;
 import io.github.spharris.stash.service.EnvironmentServiceImpl;
 import io.github.spharris.stash.service.PolicyService;
@@ -39,5 +40,7 @@ public class TestModule extends AbstractModule {
       .setSerializationInclusion(Include.NON_NULL)
       .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
       .registerModule(new GuavaModule()));
+    
+    bind(JsonUtil.class);
   }
 }

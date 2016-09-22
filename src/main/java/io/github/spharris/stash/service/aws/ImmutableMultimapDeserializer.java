@@ -11,7 +11,10 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
 
-public class ImmutableMultimapDeserializer extends
+/**
+ * Deserializer that accepts "key":"value" as a multimap
+ */
+class ImmutableMultimapDeserializer extends
     JsonDeserializer<ImmutableMultimap<String, String>>{
 
   @Override
