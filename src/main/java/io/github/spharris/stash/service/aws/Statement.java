@@ -12,13 +12,17 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 
+/**
+ * Class representing an AWS policy statement. Duplicated here to make serialization and comparison
+ * simpler
+ */
 @AutoValue
 @JsonDeserialize(builder = AutoValue_Statement.Builder.class)
 public abstract class Statement {
 
-  @JsonProperty("Id") public abstract @Nullable String getId();
-  @JsonProperty("Effect") public abstract @Nullable Effect getEffect(); 
+  @JsonProperty("Sid") public abstract @Nullable String getId();
   @JsonProperty("Action") public abstract @Nullable ImmutableList<S3Actions> getActions();
+  @JsonProperty("Effect") public abstract @Nullable Effect getEffect(); 
   @JsonProperty("Resource") public abstract @Nullable ImmutableList<String> getResources();
   
   @JsonProperty("Principal")
@@ -39,15 +43,17 @@ public abstract class Statement {
     public abstract Builder setActions(S3Actions... action);
     public abstract Builder setResources(String... resources);
     
-    @JsonProperty("Id") public abstract Builder setId(String Id);
-    @JsonProperty("Effect") public abstract Builder setEffect(Effect effect); 
+    @JsonProperty("Sid") public abstract Builder setId(String Id);
     @JsonProperty("Action") public abstract Builder setActions(ImmutableList<S3Actions> action);
+    @JsonProperty("Effect") public abstract Builder setEffect(Effect effect); 
     @JsonProperty("Resource") public abstract Builder setResources(ImmutableList<String> resources);
 
     @JsonProperty("Principal")
+    @JsonDeserialize(using = PrincipalDeserializer.class)
     public abstract @Nullable Builder setPrincipals(ImmutableMultimap<String, String> setPrincipals);
 
     @JsonProperty("Condition")
+    @JsonDeserialize(using = ConditionDeserializer.class)
     public abstract Builder setConditions(
         ImmutableMap<String, ImmutableMultimap<String, String>> conditions);
 

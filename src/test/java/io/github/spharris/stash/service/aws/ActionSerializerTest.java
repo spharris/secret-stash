@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import com.amazonaws.auth.policy.Action;
 import com.amazonaws.auth.policy.actions.S3Actions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -14,8 +15,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 public class ActionSerializerTest {
   
   final ObjectMapper mapper = new ObjectMapper()
-      .registerModule(new SimpleModule().addSerializer(
-        S3Actions.class, new ActionsSerializer()));
+      .registerModule(new SimpleModule()
+        .addSerializer(Action.class, new ActionSerializer()));
   
   @Test
   public void serializesProperly() throws Exception {
