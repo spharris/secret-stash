@@ -8,8 +8,6 @@ import javax.inject.Inject;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.S3Object;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 
 import io.github.spharris.stash.Project;
@@ -19,19 +17,20 @@ import io.github.spharris.stash.service.request.DeleteProjectRequest;
 import io.github.spharris.stash.service.request.GetProjectRequest;
 import io.github.spharris.stash.service.request.ListProjectsRequest;
 import io.github.spharris.stash.service.request.UpdateProjectRequest;
+import io.github.spharris.stash.service.utils.JsonUtil;
 import io.github.spharris.stash.service.utils.ObjectNameUtil;
 
 public class ProjectServiceImpl implements ProjectService {
 
   private final String bucketName;
   private final AmazonS3 s3client;
-  private final ObjectMapper mapper;
+  private final JsonUtil json;
   
   @Inject
-  ProjectServiceImpl(@BucketOfSecrets String bucketName, AmazonS3 s3client, ObjectMapper mapper) {
+  ProjectServiceImpl(@BucketOfSecrets String bucketName, AmazonS3 s3client, JsonUtil json) {
     this.bucketName = bucketName;
     this.s3client = s3client;
-    this.mapper = mapper;
+    this.json = json;
   }
   
   @Override
@@ -52,13 +51,8 @@ public class ProjectServiceImpl implements ProjectService {
   @Override
   public Project createProject(CreateProjectRequest request) {
     Project project = request.getProject();
-    
-    try {
-      s3client.putObject(bucketName, ObjectNameUtil.createS3Path(project.getProjectId()),
-        mapper.writeValueAsString(project));
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
+    s3client.putObject(bucketName, ObjectNameUtil.createS3Path(project.getProjectId()),
+      json.toString(project));
     
     return project;
   }
@@ -67,12 +61,8 @@ public class ProjectServiceImpl implements ProjectService {
   public Project getProject(GetProjectRequest request) {
     S3Object result = s3client.getObject(bucketName, ObjectNameUtil.createS3Path(
       request.getProjectId()));
-    
-    try {
-      return mapper.readValue(result.getObjectContent(), Project.class);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+
+    return json.fromInputStream(result.getObjectContent(), Project.class);
   }
 
   @Override
