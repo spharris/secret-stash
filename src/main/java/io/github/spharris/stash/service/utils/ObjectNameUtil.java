@@ -4,6 +4,8 @@ import java.util.function.Predicate;
 
 public class ObjectNameUtil {
   
+  private static final String AWS_S3_NAMESPACE = "arn:aws:s3:::";
+  
   private ObjectNameUtil() {}
   
   public static String createS3Path(String projectId) {
@@ -18,6 +20,10 @@ public class ObjectNameUtil {
   
   public static String extractProjectId(String key) {
     return key.split("/")[0];
+  }
+  
+  public static String createEnvironmentResource(String projectId, String environmentId) {
+    return AWS_S3_NAMESPACE + createS3Path(projectId, environmentId) + "*";
   }
   
   public static String createS3Path(String projectId, String environmentId) {

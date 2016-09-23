@@ -44,9 +44,9 @@ public abstract class Statement {
     public abstract Builder setResources(String... resources);
     
     @JsonProperty("Sid") public abstract Builder setId(String Id);
-    @JsonProperty("Action") public abstract Builder setActions(ImmutableList<S3Actions> action);
+    @JsonProperty("Action") public abstract Builder setActions(Iterable<S3Actions> action);
     @JsonProperty("Effect") public abstract Builder setEffect(Effect effect); 
-    @JsonProperty("Resource") public abstract Builder setResources(ImmutableList<String> resources);
+    @JsonProperty("Resource") public abstract Builder setResources(Iterable<String> resources);
 
     @JsonProperty("Principal")
     @JsonDeserialize(using = PrincipalDeserializer.class)

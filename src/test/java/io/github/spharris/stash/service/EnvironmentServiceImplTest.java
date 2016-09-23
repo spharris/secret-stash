@@ -10,19 +10,19 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Guice;
 
 import io.github.spharris.stash.Environment;
 import io.github.spharris.stash.service.request.CreateEnvironmentRequest;
 import io.github.spharris.stash.service.testing.TestEntities;
 import io.github.spharris.stash.service.testing.TestModule;
+import io.github.spharris.stash.service.utils.JsonUtil;
 import io.github.spharris.stash.service.utils.ObjectNameUtil;
 
 @RunWith(JUnit4.class)
 public class EnvironmentServiceImplTest {
 
-  @Inject ObjectMapper mapper;
+  @Inject JsonUtil json;
   @Inject AmazonS3 client;
   @Inject EnvironmentService environmentService;
   
@@ -50,7 +50,7 @@ public class EnvironmentServiceImplTest {
       .setEnvironment(TestEntities.TEST_ENVIRONMENT)
       .build());
     
-    Environment result = mapper.readValue(client.getObject(TestEntities.TEST_BUCKET,
+    Environment result = json.fromInputStream(client.getObject(TestEntities.TEST_BUCKET,
       ObjectNameUtil.createS3Path(TestEntities.TEST_PROJECT_ID, TestEntities.TEST_ENVIRONMENT_ID))
       .getObjectContent(), Environment.class);
     

@@ -29,8 +29,8 @@ public abstract class AccessControlList {
     public abstract Builder setRoles(String... roles);
     public abstract Builder setGroups(String... groups);
     
-    @JsonProperty("roles") public abstract Builder setRoles(ImmutableList<String> roles);
-    @JsonProperty("groups") public abstract Builder setGroups(ImmutableList<String> groups);
+    @JsonProperty("roles") public abstract Builder setRoles(Iterable<String> roles);
+    @JsonProperty("groups") public abstract Builder setGroups(Iterable<String> groups);
     
     public abstract AccessControlList build();
   }

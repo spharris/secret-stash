@@ -29,10 +29,13 @@ public abstract class Environment {
     public abstract Builder setDescription(String description);
     public abstract Builder setAcl(AccessControlList acl);
     
+    protected abstract AccessControlList getAcl();
     protected abstract Environment autoBuild();
     public Environment build() {
       // Do this here instead of in builder() above so that Jackson doesn't barf
-      setAcl(AccessControlList.builder().build());
+      if (getAcl() == null) {
+        setAcl(AccessControlList.builder().build());
+      }
       return autoBuild();
     }
   }

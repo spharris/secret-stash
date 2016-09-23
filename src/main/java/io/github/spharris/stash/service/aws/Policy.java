@@ -37,7 +37,7 @@ public abstract class Policy {
     @JsonProperty("Version") public abstract Builder setVersion(String version);
     
     @JsonProperty("Statement")
-    public abstract Builder setStatements(ImmutableList<Statement> statements);
+    public abstract Builder setStatements(Iterable<Statement> statements);
     
     public abstract Policy build();
   }

@@ -10,7 +10,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Guice;
 
@@ -20,12 +19,13 @@ import io.github.spharris.stash.service.request.GetProjectRequest;
 import io.github.spharris.stash.service.request.ListProjectsRequest;
 import io.github.spharris.stash.service.testing.TestEntities;
 import io.github.spharris.stash.service.testing.TestModule;
+import io.github.spharris.stash.service.utils.JsonUtil;
 import io.github.spharris.stash.service.utils.ObjectNameUtil;
 
 @RunWith(JUnit4.class)
 public class ProjectServiceImplTest {
 
-  @Inject ObjectMapper mapper;
+  @Inject JsonUtil json;
   @Inject AmazonS3 client;
   @Inject ProjectService projectService;
   
@@ -51,7 +51,7 @@ public class ProjectServiceImplTest {
       .setProject(TestEntities.TEST_PROJECT)
       .build());
     
-    Project result = mapper.readValue(client.getObject(TestEntities.TEST_BUCKET,
+    Project result = json.fromInputStream(client.getObject(TestEntities.TEST_BUCKET,
       ObjectNameUtil.createS3Path(TestEntities.TEST_PROJECT_ID)).getObjectContent(), Project.class);
     
     assertThat(result).isEqualTo(TestEntities.TEST_PROJECT);

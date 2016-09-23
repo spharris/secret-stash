@@ -11,19 +11,19 @@ import org.junit.runners.JUnit4;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Guice;
 
 import io.github.spharris.stash.Secret;
 import io.github.spharris.stash.service.request.CreateSecretRequest;
 import io.github.spharris.stash.service.testing.TestEntities;
 import io.github.spharris.stash.service.testing.TestModule;
+import io.github.spharris.stash.service.utils.JsonUtil;
 import io.github.spharris.stash.service.utils.ObjectNameUtil;
 
 @RunWith(JUnit4.class)
 public class SecretServiceImplTest {
 
-  @Inject ObjectMapper mapper;
+  @Inject JsonUtil json;
   @Inject AmazonS3 client;
   @Inject SecretService secretService;
   
@@ -55,7 +55,7 @@ public class SecretServiceImplTest {
       .setSecret(TestEntities.TEST_SECRET)
       .build());
     
-    Secret result = mapper.readValue(client.getObject(TestEntities.TEST_BUCKET,
+    Secret result = json.fromInputStream(client.getObject(TestEntities.TEST_BUCKET,
       ObjectNameUtil.createS3Path(
         TestEntities.TEST_PROJECT_ID,
         TestEntities.TEST_ENVIRONMENT_ID,

@@ -3,7 +3,6 @@ package io.github.spharris.stash.service;
 import javax.inject.Inject;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableList;
 
 import io.github.spharris.stash.Environment;

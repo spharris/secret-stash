@@ -1,6 +1,5 @@
 package io.github.spharris.stash.service;
 
-import java.io.IOException;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;

@@ -24,6 +24,16 @@ public class ObjectNameUtilTest {
       TestEntities.TEST_ENVIRONMENT_ID))
       .isEqualTo(TestEntities.TEST_PROJECT_ID + "/" + TestEntities.TEST_ENVIRONMENT_ID + "/");
   }
+  
+  @Test
+  public void createsEnvironmentResource() {
+    assertThat(ObjectNameUtil.createEnvironmentResource(
+      TestEntities.TEST_PROJECT_ID,
+      TestEntities.TEST_ENVIRONMENT_ID))
+      .isEqualTo("arn:aws:s3:::"
+          + TestEntities.TEST_PROJECT_ID + "/"
+          + TestEntities.TEST_ENVIRONMENT_ID + "/*");
+  }
    
   @Test
   public void createsSecretName() {

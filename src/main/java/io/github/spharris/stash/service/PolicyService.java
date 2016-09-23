@@ -2,6 +2,7 @@ package io.github.spharris.stash.service;
 
 import com.amazonaws.services.identitymanagement.model.DeletePolicyRequest;
 
+import io.github.spharris.stash.service.aws.Policy;
 import io.github.spharris.stash.service.request.UpdatePolicyRequest;
 
 public interface PolicyService {
@@ -12,6 +13,6 @@ public interface PolicyService {
    */
   public static final String POLICY_ID = "stash-generated-policy";
   
-  void updatePolicy(UpdatePolicyRequest request);
-  void deletePolicy(DeletePolicyRequest request); 
+  Policy updateEnvironmentPolicy(UpdatePolicyRequest request);
+  void deleteEnvironmentPolicy(DeletePolicyRequest request); 
 }
