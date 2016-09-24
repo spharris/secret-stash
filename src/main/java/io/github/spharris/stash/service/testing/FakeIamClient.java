@@ -1,48 +1,79 @@
 package io.github.spharris.stash.service.testing;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.amazonaws.AmazonWebServiceRequest;
 import com.amazonaws.ResponseMetadata;
 import com.amazonaws.regions.Region;
 import com.amazonaws.services.identitymanagement.AmazonIdentityManagement;
 import com.amazonaws.services.identitymanagement.model.*;
 import com.amazonaws.services.identitymanagement.waiters.AmazonIdentityManagementWaiters;
+import com.google.common.base.Splitter;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
 
 public class FakeIamClient implements AmazonIdentityManagement {
 
+  private static final String ARN_PREFIX = "arn:aws:iam::" + TestEntities.TEST_POLICY_ACCOUNT
+      + ":policy";
+  
+  // Maps groups/roles to attached policies
+  private final Multimap<String, String> policyAssignments = HashMultimap.create();
+  private final Map<String, Policy> policies = new HashMap<>();
+  
+  @Override
+  public void setEndpoint(String endpoint) {}
+
+  @Override
+  public void setRegion(Region region) {}
+
   @Override
   public AddClientIDToOpenIDConnectProviderResult addClientIDToOpenIDConnectProvider(
-      AddClientIDToOpenIDConnectProviderRequest arg0) {
+      AddClientIDToOpenIDConnectProviderRequest addClientIDToOpenIDConnectProviderRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public AddRoleToInstanceProfileResult addRoleToInstanceProfile(
-      AddRoleToInstanceProfileRequest arg0) {
+      AddRoleToInstanceProfileRequest addRoleToInstanceProfileRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public AddUserToGroupResult addUserToGroup(AddUserToGroupRequest arg0) {
+  public AddUserToGroupResult addUserToGroup(AddUserToGroupRequest addUserToGroupRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public AttachGroupPolicyResult attachGroupPolicy(AttachGroupPolicyRequest arg0) {
+  public AttachGroupPolicyResult attachGroupPolicy(
+      AttachGroupPolicyRequest request) {
+    policyAssignments.put(request.getGroupName(), request.getPolicyArn());
+    
+    return new AttachGroupPolicyResult();
+  }
+
+  @Override
+  public AttachRolePolicyResult attachRolePolicy(AttachRolePolicyRequest request) {
+    policyAssignments.put(request.getRoleName(), request.getPolicyArn());
+    
+    return new AttachRolePolicyResult();
+  }
+
+  @Override
+  public AttachUserPolicyResult attachUserPolicy(AttachUserPolicyRequest attachUserPolicyRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public AttachRolePolicyResult attachRolePolicy(AttachRolePolicyRequest arg0) {
+  public ChangePasswordResult changePassword(ChangePasswordRequest changePasswordRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public AttachUserPolicyResult attachUserPolicy(AttachUserPolicyRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public ChangePasswordResult changePassword(ChangePasswordRequest arg0) {
+  public CreateAccessKeyResult createAccessKey(CreateAccessKeyRequest createAccessKeyRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -52,78 +83,99 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public CreateAccessKeyResult createAccessKey(CreateAccessKeyRequest arg0) {
+  public CreateAccountAliasResult createAccountAlias(
+      CreateAccountAliasRequest createAccountAliasRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public CreateAccountAliasResult createAccountAlias(CreateAccountAliasRequest arg0) {
+  public CreateGroupResult createGroup(CreateGroupRequest createGroupRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public CreateGroupResult createGroup(CreateGroupRequest arg0) {
+  public CreateInstanceProfileResult createInstanceProfile(
+      CreateInstanceProfileRequest createInstanceProfileRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public CreateInstanceProfileResult createInstanceProfile(CreateInstanceProfileRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public CreateLoginProfileResult createLoginProfile(CreateLoginProfileRequest arg0) {
+  public CreateLoginProfileResult createLoginProfile(
+      CreateLoginProfileRequest createLoginProfileRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public CreateOpenIDConnectProviderResult createOpenIDConnectProvider(
-      CreateOpenIDConnectProviderRequest arg0) {
+      CreateOpenIDConnectProviderRequest createOpenIDConnectProviderRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public CreatePolicyResult createPolicy(CreatePolicyRequest arg0) {
+  public CreatePolicyResult createPolicy(CreatePolicyRequest request) {
+    Policy p = new Policy();
+    if (request.getPath() != null) {
+      p.setPath(request.getPath());
+    } else {
+      p.setPath("/");
+    }
+    
+    p.setArn(ARN_PREFIX + p.getPath() + request.getPolicyName());
+    p.setPolicyName(request.getPolicyName());
+    policies.put(p.getArn(), p);
+    
+    return new CreatePolicyResult()
+        .withPolicy(p);
+  }
+
+  @Override
+  public CreatePolicyVersionResult createPolicyVersion(
+      CreatePolicyVersionRequest createPolicyVersionRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public CreatePolicyVersionResult createPolicyVersion(CreatePolicyVersionRequest arg0) {
+  public CreateRoleResult createRole(CreateRoleRequest createRoleRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public CreateRoleResult createRole(CreateRoleRequest arg0) {
+  public CreateSAMLProviderResult createSAMLProvider(
+      CreateSAMLProviderRequest createSAMLProviderRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public CreateSAMLProviderResult createSAMLProvider(CreateSAMLProviderRequest arg0) {
+  public CreateUserResult createUser(CreateUserRequest createUserRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public CreateUserResult createUser(CreateUserRequest arg0) {
+  public CreateVirtualMFADeviceResult createVirtualMFADevice(
+      CreateVirtualMFADeviceRequest createVirtualMFADeviceRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public CreateVirtualMFADeviceResult createVirtualMFADevice(CreateVirtualMFADeviceRequest arg0) {
+  public DeactivateMFADeviceResult deactivateMFADevice(
+      DeactivateMFADeviceRequest deactivateMFADeviceRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DeactivateMFADeviceResult deactivateMFADevice(DeactivateMFADeviceRequest arg0) {
+  public DeleteAccessKeyResult deleteAccessKey(DeleteAccessKeyRequest deleteAccessKeyRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DeleteAccessKeyResult deleteAccessKey(DeleteAccessKeyRequest arg0) {
+  public DeleteAccountAliasResult deleteAccountAlias(
+      DeleteAccountAliasRequest deleteAccountAliasRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DeleteAccountAliasResult deleteAccountAlias(DeleteAccountAliasRequest arg0) {
+  public DeleteAccountPasswordPolicyResult deleteAccountPasswordPolicy(
+      DeleteAccountPasswordPolicyRequest deleteAccountPasswordPolicyRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -133,111 +185,123 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public DeleteAccountPasswordPolicyResult deleteAccountPasswordPolicy(
-      DeleteAccountPasswordPolicyRequest arg0) {
+  public DeleteGroupResult deleteGroup(DeleteGroupRequest deleteGroupRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DeleteGroupResult deleteGroup(DeleteGroupRequest arg0) {
+  public DeleteGroupPolicyResult deleteGroupPolicy(
+      DeleteGroupPolicyRequest deleteGroupPolicyRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DeleteGroupPolicyResult deleteGroupPolicy(DeleteGroupPolicyRequest arg0) {
+  public DeleteInstanceProfileResult deleteInstanceProfile(
+      DeleteInstanceProfileRequest deleteInstanceProfileRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DeleteInstanceProfileResult deleteInstanceProfile(DeleteInstanceProfileRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public DeleteLoginProfileResult deleteLoginProfile(DeleteLoginProfileRequest arg0) {
+  public DeleteLoginProfileResult deleteLoginProfile(
+      DeleteLoginProfileRequest deleteLoginProfileRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public DeleteOpenIDConnectProviderResult deleteOpenIDConnectProvider(
-      DeleteOpenIDConnectProviderRequest arg0) {
+      DeleteOpenIDConnectProviderRequest deleteOpenIDConnectProviderRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DeletePolicyResult deletePolicy(DeletePolicyRequest arg0) {
+  public DeletePolicyResult deletePolicy(DeletePolicyRequest deletePolicyRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DeletePolicyVersionResult deletePolicyVersion(DeletePolicyVersionRequest arg0) {
+  public DeletePolicyVersionResult deletePolicyVersion(
+      DeletePolicyVersionRequest deletePolicyVersionRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DeleteRoleResult deleteRole(DeleteRoleRequest arg0) {
+  public DeleteRoleResult deleteRole(DeleteRoleRequest deleteRoleRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DeleteRolePolicyResult deleteRolePolicy(DeleteRolePolicyRequest arg0) {
+  public DeleteRolePolicyResult deleteRolePolicy(DeleteRolePolicyRequest deleteRolePolicyRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DeleteSAMLProviderResult deleteSAMLProvider(DeleteSAMLProviderRequest arg0) {
+  public DeleteSAMLProviderResult deleteSAMLProvider(
+      DeleteSAMLProviderRequest deleteSAMLProviderRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DeleteSSHPublicKeyResult deleteSSHPublicKey(DeleteSSHPublicKeyRequest arg0) {
+  public DeleteSSHPublicKeyResult deleteSSHPublicKey(
+      DeleteSSHPublicKeyRequest deleteSSHPublicKeyRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public DeleteServerCertificateResult deleteServerCertificate(
-      DeleteServerCertificateRequest arg0) {
+      DeleteServerCertificateRequest deleteServerCertificateRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public DeleteSigningCertificateResult deleteSigningCertificate(
-      DeleteSigningCertificateRequest arg0) {
+      DeleteSigningCertificateRequest deleteSigningCertificateRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DeleteUserResult deleteUser(DeleteUserRequest arg0) {
+  public DeleteUserResult deleteUser(DeleteUserRequest deleteUserRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DeleteUserPolicyResult deleteUserPolicy(DeleteUserPolicyRequest arg0) {
+  public DeleteUserPolicyResult deleteUserPolicy(DeleteUserPolicyRequest deleteUserPolicyRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DeleteVirtualMFADeviceResult deleteVirtualMFADevice(DeleteVirtualMFADeviceRequest arg0) {
+  public DeleteVirtualMFADeviceResult deleteVirtualMFADevice(
+      DeleteVirtualMFADeviceRequest deleteVirtualMFADeviceRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DetachGroupPolicyResult detachGroupPolicy(DetachGroupPolicyRequest arg0) {
+  public DetachGroupPolicyResult detachGroupPolicy(
+      DetachGroupPolicyRequest request) {
+    policyAssignments.remove(request.getGroupName(), request.getPolicyArn());
+    
+    return new DetachGroupPolicyResult();
+  }
+
+  @Override
+  public DetachRolePolicyResult detachRolePolicy(DetachRolePolicyRequest request) {
+    policyAssignments.remove(request.getRoleName(), request.getPolicyArn());
+    
+    return new DetachRolePolicyResult();
+  }
+
+  @Override
+  public DetachUserPolicyResult detachUserPolicy(DetachUserPolicyRequest detachUserPolicyRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DetachRolePolicyResult detachRolePolicy(DetachRolePolicyRequest arg0) {
+  public EnableMFADeviceResult enableMFADevice(EnableMFADeviceRequest enableMFADeviceRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DetachUserPolicyResult detachUserPolicy(DetachUserPolicyRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public EnableMFADeviceResult enableMFADevice(EnableMFADeviceRequest arg0) {
+  public GenerateCredentialReportResult generateCredentialReport(
+      GenerateCredentialReportRequest generateCredentialReportRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -247,13 +311,14 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public GenerateCredentialReportResult generateCredentialReport(
-      GenerateCredentialReportRequest arg0) {
+  public GetAccessKeyLastUsedResult getAccessKeyLastUsed(
+      GetAccessKeyLastUsedRequest getAccessKeyLastUsedRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public GetAccessKeyLastUsedResult getAccessKeyLastUsed(GetAccessKeyLastUsedRequest arg0) {
+  public GetAccountAuthorizationDetailsResult getAccountAuthorizationDetails(
+      GetAccountAuthorizationDetailsRequest getAccountAuthorizationDetailsRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -263,8 +328,8 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public GetAccountAuthorizationDetailsResult getAccountAuthorizationDetails(
-      GetAccountAuthorizationDetailsRequest arg0) {
+  public GetAccountPasswordPolicyResult getAccountPasswordPolicy(
+      GetAccountPasswordPolicyRequest getAccountPasswordPolicyRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -274,8 +339,8 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public GetAccountPasswordPolicyResult getAccountPasswordPolicy(
-      GetAccountPasswordPolicyRequest arg0) {
+  public GetAccountSummaryResult getAccountSummary(
+      GetAccountSummaryRequest getAccountSummaryRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -285,24 +350,20 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public GetAccountSummaryResult getAccountSummary(GetAccountSummaryRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public ResponseMetadata getCachedResponseMetadata(AmazonWebServiceRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public GetContextKeysForCustomPolicyResult getContextKeysForCustomPolicy(
-      GetContextKeysForCustomPolicyRequest arg0) {
+      GetContextKeysForCustomPolicyRequest getContextKeysForCustomPolicyRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public GetContextKeysForPrincipalPolicyResult getContextKeysForPrincipalPolicy(
-      GetContextKeysForPrincipalPolicyRequest arg0) {
+      GetContextKeysForPrincipalPolicyRequest getContextKeysForPrincipalPolicyRequest) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public GetCredentialReportResult getCredentialReport(
+      GetCredentialReportRequest getCredentialReportRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -312,68 +373,71 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public GetCredentialReportResult getCredentialReport(GetCredentialReportRequest arg0) {
+  public GetGroupResult getGroup(GetGroupRequest getGroupRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public GetGroupResult getGroup(GetGroupRequest arg0) {
+  public GetGroupPolicyResult getGroupPolicy(GetGroupPolicyRequest getGroupPolicyRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public GetGroupPolicyResult getGroupPolicy(GetGroupPolicyRequest arg0) {
+  public GetInstanceProfileResult getInstanceProfile(
+      GetInstanceProfileRequest getInstanceProfileRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public GetInstanceProfileResult getInstanceProfile(GetInstanceProfileRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public GetLoginProfileResult getLoginProfile(GetLoginProfileRequest arg0) {
+  public GetLoginProfileResult getLoginProfile(GetLoginProfileRequest getLoginProfileRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public GetOpenIDConnectProviderResult getOpenIDConnectProvider(
-      GetOpenIDConnectProviderRequest arg0) {
+      GetOpenIDConnectProviderRequest getOpenIDConnectProviderRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public GetPolicyResult getPolicy(GetPolicyRequest arg0) {
+  public GetPolicyResult getPolicy(GetPolicyRequest request) {
+    return new GetPolicyResult()
+        .withPolicy(policies.get(request.getPolicyArn()));
+  }
+
+  @Override
+  public GetPolicyVersionResult getPolicyVersion(GetPolicyVersionRequest getPolicyVersionRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public GetPolicyVersionResult getPolicyVersion(GetPolicyVersionRequest arg0) {
+  public GetRoleResult getRole(GetRoleRequest getRoleRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public GetRoleResult getRole(GetRoleRequest arg0) {
+  public GetRolePolicyResult getRolePolicy(GetRolePolicyRequest getRolePolicyRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public GetRolePolicyResult getRolePolicy(GetRolePolicyRequest arg0) {
+  public GetSAMLProviderResult getSAMLProvider(GetSAMLProviderRequest getSAMLProviderRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public GetSAMLProviderResult getSAMLProvider(GetSAMLProviderRequest arg0) {
+  public GetSSHPublicKeyResult getSSHPublicKey(GetSSHPublicKeyRequest getSSHPublicKeyRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public GetSSHPublicKeyResult getSSHPublicKey(GetSSHPublicKeyRequest arg0) {
+  public GetServerCertificateResult getServerCertificate(
+      GetServerCertificateRequest getServerCertificateRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public GetServerCertificateResult getServerCertificate(GetServerCertificateRequest arg0) {
+  public GetUserResult getUser(GetUserRequest getUserRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -383,12 +447,12 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public GetUserResult getUser(GetUserRequest arg0) {
+  public GetUserPolicyResult getUserPolicy(GetUserPolicyRequest getUserPolicyRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public GetUserPolicyResult getUserPolicy(GetUserPolicyRequest arg0) {
+  public ListAccessKeysResult listAccessKeys(ListAccessKeysRequest listAccessKeysRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -398,7 +462,8 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public ListAccessKeysResult listAccessKeys(ListAccessKeysRequest arg0) {
+  public ListAccountAliasesResult listAccountAliases(
+      ListAccountAliasesRequest listAccountAliasesRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -408,35 +473,57 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public ListAccountAliasesResult listAccountAliases(ListAccountAliasesRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public ListAttachedGroupPoliciesResult listAttachedGroupPolicies(
-      ListAttachedGroupPoliciesRequest arg0) {
-    throw new UnsupportedOperationException();
+      ListAttachedGroupPoliciesRequest request) {
+    ListAttachedGroupPoliciesResult result = new ListAttachedGroupPoliciesResult();
+    
+    ImmutableList.Builder<AttachedPolicy> builder = ImmutableList.builder();
+    for (String p : policyAssignments.get(request.getGroupName())) {
+      builder.add(new AttachedPolicy()
+        .withPolicyArn(p)
+        .withPolicyName(Iterables.getLast(Splitter.on("/").splitToList(p))));
+    }
+    
+    result.setAttachedPolicies(builder.build());
+    return result;
   }
 
   @Override
   public ListAttachedRolePoliciesResult listAttachedRolePolicies(
-      ListAttachedRolePoliciesRequest arg0) {
-    throw new UnsupportedOperationException();
+      ListAttachedRolePoliciesRequest request) {
+    ListAttachedRolePoliciesResult result = new ListAttachedRolePoliciesResult();
+    
+    ImmutableList.Builder<AttachedPolicy> builder = ImmutableList.builder();
+    for (String p : policyAssignments.get(request.getRoleName())) {
+      builder.add(new AttachedPolicy()
+        .withPolicyArn(p)
+        .withPolicyName(Iterables.getLast(Splitter.on("/").splitToList(p))));
+    }
+    
+    result.setAttachedPolicies(builder.build());
+    return result;
   }
 
   @Override
   public ListAttachedUserPoliciesResult listAttachedUserPolicies(
-      ListAttachedUserPoliciesRequest arg0) {
+      ListAttachedUserPoliciesRequest listAttachedUserPoliciesRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public ListEntitiesForPolicyResult listEntitiesForPolicy(ListEntitiesForPolicyRequest arg0) {
+  public ListEntitiesForPolicyResult listEntitiesForPolicy(
+      ListEntitiesForPolicyRequest listEntitiesForPolicyRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public ListGroupPoliciesResult listGroupPolicies(ListGroupPoliciesRequest arg0) {
+  public ListGroupPoliciesResult listGroupPolicies(
+      ListGroupPoliciesRequest listGroupPoliciesRequest) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public ListGroupsResult listGroups(ListGroupsRequest listGroupsRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -446,12 +533,14 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public ListGroupsResult listGroups(ListGroupsRequest arg0) {
+  public ListGroupsForUserResult listGroupsForUser(
+      ListGroupsForUserRequest listGroupsForUserRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public ListGroupsForUserResult listGroupsForUser(ListGroupsForUserRequest arg0) {
+  public ListInstanceProfilesResult listInstanceProfiles(
+      ListInstanceProfilesRequest listInstanceProfilesRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -461,13 +550,13 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public ListInstanceProfilesResult listInstanceProfiles(ListInstanceProfilesRequest arg0) {
+  public ListInstanceProfilesForRoleResult listInstanceProfilesForRole(
+      ListInstanceProfilesForRoleRequest listInstanceProfilesForRoleRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public ListInstanceProfilesForRoleResult listInstanceProfilesForRole(
-      ListInstanceProfilesForRoleRequest arg0) {
+  public ListMFADevicesResult listMFADevices(ListMFADevicesRequest listMFADevicesRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -477,7 +566,8 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public ListMFADevicesResult listMFADevices(ListMFADevicesRequest arg0) {
+  public ListOpenIDConnectProvidersResult listOpenIDConnectProviders(
+      ListOpenIDConnectProvidersRequest listOpenIDConnectProvidersRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -487,8 +577,7 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public ListOpenIDConnectProvidersResult listOpenIDConnectProviders(
-      ListOpenIDConnectProvidersRequest arg0) {
+  public ListPoliciesResult listPolicies(ListPoliciesRequest listPoliciesRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -498,17 +587,18 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public ListPoliciesResult listPolicies(ListPoliciesRequest arg0) {
+  public ListPolicyVersionsResult listPolicyVersions(
+      ListPolicyVersionsRequest listPolicyVersionsRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public ListPolicyVersionsResult listPolicyVersions(ListPolicyVersionsRequest arg0) {
+  public ListRolePoliciesResult listRolePolicies(ListRolePoliciesRequest listRolePoliciesRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public ListRolePoliciesResult listRolePolicies(ListRolePoliciesRequest arg0) {
+  public ListRolesResult listRoles(ListRolesRequest listRolesRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -518,7 +608,8 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public ListRolesResult listRoles(ListRolesRequest arg0) {
+  public ListSAMLProvidersResult listSAMLProviders(
+      ListSAMLProvidersRequest listSAMLProvidersRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -528,7 +619,8 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public ListSAMLProvidersResult listSAMLProviders(ListSAMLProvidersRequest arg0) {
+  public ListSSHPublicKeysResult listSSHPublicKeys(
+      ListSSHPublicKeysRequest listSSHPublicKeysRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -538,7 +630,8 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public ListSSHPublicKeysResult listSSHPublicKeys(ListSSHPublicKeysRequest arg0) {
+  public ListServerCertificatesResult listServerCertificates(
+      ListServerCertificatesRequest listServerCertificatesRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -548,7 +641,8 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public ListServerCertificatesResult listServerCertificates(ListServerCertificatesRequest arg0) {
+  public ListSigningCertificatesResult listSigningCertificates(
+      ListSigningCertificatesRequest listSigningCertificatesRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -558,13 +652,12 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public ListSigningCertificatesResult listSigningCertificates(
-      ListSigningCertificatesRequest arg0) {
+  public ListUserPoliciesResult listUserPolicies(ListUserPoliciesRequest listUserPoliciesRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public ListUserPoliciesResult listUserPolicies(ListUserPoliciesRequest arg0) {
+  public ListUsersResult listUsers(ListUsersRequest listUsersRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -574,7 +667,8 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public ListUsersResult listUsers(ListUsersRequest arg0) {
+  public ListVirtualMFADevicesResult listVirtualMFADevices(
+      ListVirtualMFADevicesRequest listVirtualMFADevicesRequest) {
     throw new UnsupportedOperationException();
   }
 
@@ -584,63 +678,140 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public ListVirtualMFADevicesResult listVirtualMFADevices(ListVirtualMFADevicesRequest arg0) {
+  public PutGroupPolicyResult putGroupPolicy(PutGroupPolicyRequest putGroupPolicyRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public PutGroupPolicyResult putGroupPolicy(PutGroupPolicyRequest arg0) {
+  public PutRolePolicyResult putRolePolicy(PutRolePolicyRequest putRolePolicyRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public PutRolePolicyResult putRolePolicy(PutRolePolicyRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public PutUserPolicyResult putUserPolicy(PutUserPolicyRequest arg0) {
+  public PutUserPolicyResult putUserPolicy(PutUserPolicyRequest putUserPolicyRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public RemoveClientIDFromOpenIDConnectProviderResult removeClientIDFromOpenIDConnectProvider(
-      RemoveClientIDFromOpenIDConnectProviderRequest arg0) {
+      RemoveClientIDFromOpenIDConnectProviderRequest removeClientIDFromOpenIDConnectProviderRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public RemoveRoleFromInstanceProfileResult removeRoleFromInstanceProfile(
-      RemoveRoleFromInstanceProfileRequest arg0) {
+      RemoveRoleFromInstanceProfileRequest removeRoleFromInstanceProfileRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public RemoveUserFromGroupResult removeUserFromGroup(RemoveUserFromGroupRequest arg0) {
+  public RemoveUserFromGroupResult removeUserFromGroup(
+      RemoveUserFromGroupRequest removeUserFromGroupRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public ResyncMFADeviceResult resyncMFADevice(ResyncMFADeviceRequest arg0) {
+  public ResyncMFADeviceResult resyncMFADevice(ResyncMFADeviceRequest resyncMFADeviceRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public SetDefaultPolicyVersionResult setDefaultPolicyVersion(
-      SetDefaultPolicyVersionRequest arg0) {
+      SetDefaultPolicyVersionRequest setDefaultPolicyVersionRequest) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public void setEndpoint(String arg0) {
-    // TODO Auto-generated method stub
-
+  public SimulateCustomPolicyResult simulateCustomPolicy(
+      SimulateCustomPolicyRequest simulateCustomPolicyRequest) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
-  public void setRegion(Region arg0) {
-    // TODO Auto-generated method stub
+  public SimulatePrincipalPolicyResult simulatePrincipalPolicy(
+      SimulatePrincipalPolicyRequest simulatePrincipalPolicyRequest) {
+    throw new UnsupportedOperationException();
+  }
 
+  @Override
+  public UpdateAccessKeyResult updateAccessKey(UpdateAccessKeyRequest updateAccessKeyRequest) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public UpdateAccountPasswordPolicyResult updateAccountPasswordPolicy(
+      UpdateAccountPasswordPolicyRequest updateAccountPasswordPolicyRequest) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public UpdateAssumeRolePolicyResult updateAssumeRolePolicy(
+      UpdateAssumeRolePolicyRequest updateAssumeRolePolicyRequest) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public UpdateGroupResult updateGroup(UpdateGroupRequest updateGroupRequest) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public UpdateLoginProfileResult updateLoginProfile(
+      UpdateLoginProfileRequest updateLoginProfileRequest) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public UpdateOpenIDConnectProviderThumbprintResult updateOpenIDConnectProviderThumbprint(
+      UpdateOpenIDConnectProviderThumbprintRequest updateOpenIDConnectProviderThumbprintRequest) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public UpdateSAMLProviderResult updateSAMLProvider(
+      UpdateSAMLProviderRequest updateSAMLProviderRequest) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public UpdateSSHPublicKeyResult updateSSHPublicKey(
+      UpdateSSHPublicKeyRequest updateSSHPublicKeyRequest) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public UpdateServerCertificateResult updateServerCertificate(
+      UpdateServerCertificateRequest updateServerCertificateRequest) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public UpdateSigningCertificateResult updateSigningCertificate(
+      UpdateSigningCertificateRequest updateSigningCertificateRequest) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public UpdateUserResult updateUser(UpdateUserRequest updateUserRequest) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public UploadSSHPublicKeyResult uploadSSHPublicKey(
+      UploadSSHPublicKeyRequest uploadSSHPublicKeyRequest) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public UploadServerCertificateResult uploadServerCertificate(
+      UploadServerCertificateRequest uploadServerCertificateRequest) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public UploadSigningCertificateResult uploadSigningCertificate(
+      UploadSigningCertificateRequest uploadSigningCertificateRequest) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -650,89 +821,7 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public SimulateCustomPolicyResult simulateCustomPolicy(SimulateCustomPolicyRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public SimulatePrincipalPolicyResult simulatePrincipalPolicy(
-      SimulatePrincipalPolicyRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public UpdateAccessKeyResult updateAccessKey(UpdateAccessKeyRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public UpdateAccountPasswordPolicyResult updateAccountPasswordPolicy(
-      UpdateAccountPasswordPolicyRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public UpdateAssumeRolePolicyResult updateAssumeRolePolicy(UpdateAssumeRolePolicyRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public UpdateGroupResult updateGroup(UpdateGroupRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public UpdateLoginProfileResult updateLoginProfile(UpdateLoginProfileRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public UpdateOpenIDConnectProviderThumbprintResult updateOpenIDConnectProviderThumbprint(
-      UpdateOpenIDConnectProviderThumbprintRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public UpdateSAMLProviderResult updateSAMLProvider(UpdateSAMLProviderRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public UpdateSSHPublicKeyResult updateSSHPublicKey(UpdateSSHPublicKeyRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public UpdateServerCertificateResult updateServerCertificate(
-      UpdateServerCertificateRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public UpdateSigningCertificateResult updateSigningCertificate(
-      UpdateSigningCertificateRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public UpdateUserResult updateUser(UpdateUserRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public UploadSSHPublicKeyResult uploadSSHPublicKey(UploadSSHPublicKeyRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public UploadServerCertificateResult uploadServerCertificate(
-      UploadServerCertificateRequest arg0) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public UploadSigningCertificateResult uploadSigningCertificate(
-      UploadSigningCertificateRequest arg0) {
+  public ResponseMetadata getCachedResponseMetadata(AmazonWebServiceRequest request) {
     throw new UnsupportedOperationException();
   }
 

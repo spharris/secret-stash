@@ -39,4 +39,3 @@ public class ActionDeserializerTest {
     assertThat(result).isEqualTo(expected);
   }
 }
-

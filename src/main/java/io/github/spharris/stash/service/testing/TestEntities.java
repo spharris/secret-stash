@@ -60,5 +60,10 @@ public class TestEntities {
   /*
    * Policy-related entities
    */
+  public static final String TEST_POLICY_NAME = "test-policy-name";
+  public static final String TEST_POLICY_ID = "test-policy-id";
+  public static final String TEST_POLICY_PATH = "/test/policy/path/";
   public static final String TEST_POLICY_PREFIX = "test-policy-prefix";
+  public static final String TEST_POLICY_ARN = "test-policy-arn";
+  public static final String TEST_POLICY_ACCOUNT = "12345";
 }

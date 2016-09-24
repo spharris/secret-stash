@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -28,12 +27,7 @@ public class FakeS3ClientTest {
   final static InputStream TEST_STREAM =
       new ByteArrayInputStream(TEST_DATA.getBytes(StandardCharsets.UTF_8));
   
-  AmazonS3 client;
-  
-  @Before
-  public void initializeClient() {
-    client = new FakeS3Client();
-  }
+  final AmazonS3 client = new FakeS3Client();
   
   @Test
   public void putReturnsMetadata() {
