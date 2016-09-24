@@ -14,7 +14,7 @@ public abstract class Environment {
   
   public abstract String getEnvironmentId();
   public abstract @Nullable String getDescription();
-  public abstract AccessControlList getAcl();
+  public abstract @Nullable AccessControlList getAcl();
   
   public abstract Builder toBuilder();
   public static Builder builder() {
@@ -31,8 +31,9 @@ public abstract class Environment {
     
     protected abstract AccessControlList getAcl();
     protected abstract Environment autoBuild();
+
     public Environment build() {
-      // Do this here instead of in builder() above so that Jackson doesn't barf
+      // So that Jackson doesn't barf
       if (getAcl() == null) {
         setAcl(AccessControlList.builder().build());
       }

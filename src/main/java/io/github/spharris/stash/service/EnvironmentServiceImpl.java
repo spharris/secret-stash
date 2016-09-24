@@ -12,6 +12,7 @@ import io.github.spharris.stash.service.request.DeleteEnvironmentRequest;
 import io.github.spharris.stash.service.request.GetEnvironmentRequest;
 import io.github.spharris.stash.service.request.ListEnvironmentsRequest;
 import io.github.spharris.stash.service.request.UpdateEnvironmentRequest;
+import io.github.spharris.stash.service.request.UpdatePolicyRequest;
 import io.github.spharris.stash.service.utils.JsonUtil;
 import io.github.spharris.stash.service.utils.ObjectNameUtil;
 
@@ -20,13 +21,15 @@ public class EnvironmentServiceImpl implements EnvironmentService {
   private final String bucketName;
   private final AmazonS3 s3client;
   private final JsonUtil json;
+  private final PolicyService policyService;
   
   @Inject
-  EnvironmentServiceImpl(
-      @BucketOfSecrets String bucketName, AmazonS3 s3client, JsonUtil json) {
+  EnvironmentServiceImpl(@BucketOfSecrets String bucketName, AmazonS3 s3client, JsonUtil json,
+      PolicyService policyService) {
     this.bucketName = bucketName;
     this.s3client = s3client;
     this.json = json;
+    this.policyService = policyService;
   }
   
   @Override
@@ -43,6 +46,11 @@ public class EnvironmentServiceImpl implements EnvironmentService {
     s3client.putObject(bucketName, ObjectNameUtil.createS3Path(
       request.getProjectId(), environment.getEnvironmentId()),
       json.toString(environment));
+    
+    policyService.updateEnvironmentPolicy(UpdatePolicyRequest.builder()
+      .setProjectId(request.getProjectId())
+      .setEnvironment(request.getEnvironment())
+      .build());
     
     return environment;
   }

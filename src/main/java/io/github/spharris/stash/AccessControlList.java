@@ -1,5 +1,7 @@
 package io.github.spharris.stash;
 
+import javax.annotation.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
@@ -12,14 +14,12 @@ public abstract class AccessControlList {
   
   AccessControlList() {}
   
-  public abstract ImmutableList<String> getRoles();
-  public abstract ImmutableList<String> getGroups();
+  public abstract @Nullable ImmutableList<String> getRoles();
+  public abstract @Nullable ImmutableList<String> getGroups();
   
   public abstract Builder toBuilder();
   public static Builder builder() {
-    return new AutoValue_AccessControlList.Builder()
-        .setRoles(ImmutableList.of())
-        .setGroups(ImmutableList.of());
+    return new AutoValue_AccessControlList.Builder();
   }
   
   @AutoValue.Builder
@@ -32,6 +32,21 @@ public abstract class AccessControlList {
     @JsonProperty("roles") public abstract Builder setRoles(Iterable<String> roles);
     @JsonProperty("groups") public abstract Builder setGroups(Iterable<String> groups);
     
-    public abstract AccessControlList build();
+    protected abstract ImmutableList<String> getRoles();
+    protected abstract ImmutableList<String> getGroups();
+    protected abstract AccessControlList autoBuild();
+
+    public AccessControlList build() {
+      // So that Jackson doesn't barf
+      if (getRoles() == null) {
+        setRoles(ImmutableList.of());
+      }
+      
+      if (getGroups() == null) {
+        setGroups(ImmutableList.of());
+      }
+      
+      return autoBuild();
+    }
   }
 }

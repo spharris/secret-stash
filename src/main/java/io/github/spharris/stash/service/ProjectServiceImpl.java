@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.transfer.TransferManager;
 import com.google.common.collect.ImmutableList;
 
 import io.github.spharris.stash.Project;
@@ -24,12 +25,15 @@ public class ProjectServiceImpl implements ProjectService {
   private final String bucketName;
   private final AmazonS3 s3client;
   private final JsonUtil json;
+  TransferManager tm;
   
   @Inject
   ProjectServiceImpl(@BucketOfSecrets String bucketName, AmazonS3 s3client, JsonUtil json) {
     this.bucketName = bucketName;
     this.s3client = s3client;
     this.json = json;
+    
+    tm = new TransferManager(s3client);
   }
   
   @Override

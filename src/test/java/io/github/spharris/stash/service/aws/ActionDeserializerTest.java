@@ -6,36 +6,38 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import com.amazonaws.auth.policy.actions.S3Actions;
+import com.amazonaws.auth.policy.Action;
+import com.amazonaws.auth.policy.actions.IdentityManagementActions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 
 @RunWith(JUnit4.class)
-public class S3ActionsDeserializerTest {
+public class ActionDeserializerTest {
 
   final ObjectMapper mapper = new ObjectMapper()
       .registerModule(new SimpleModule().addDeserializer(
-        S3Actions.class, new S3ActionsDeserializer()))
+        IdentityManagementActions.class, new ActionDeserializer<>(IdentityManagementActions.class)))
       .registerModule(new GuavaModule());
 
   @Test
   public void deserializesAll() throws Exception {
-    String action = "\"s3:*\"";
+    String action = "\"iam:*\"";
     
-    S3Actions result = mapper.readValue(action, S3Actions.class);
-    S3Actions expected = S3Actions.AllS3Actions;
+    IdentityManagementActions result = mapper.readValue(action, IdentityManagementActions.class);
+    IdentityManagementActions expected = IdentityManagementActions.AllIdentityManagementActions;
     
     assertThat(result).isEqualTo(expected);
   }
   
   @Test
   public void deserializesProperty() throws Exception {
-    String action = "\"s3:GetObject\"";
+    String action = "\"iam:CreateGroup\"";
     
-    S3Actions result = mapper.readValue(action, S3Actions.class);
-    S3Actions expected = S3Actions.GetObject;
+    IdentityManagementActions result = mapper.readValue(action, IdentityManagementActions.class);
+    IdentityManagementActions expected = IdentityManagementActions.CreateGroup;
     
     assertThat(result).isEqualTo(expected);
   }
 }
+
