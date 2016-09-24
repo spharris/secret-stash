@@ -26,7 +26,7 @@ public class PolicyTest {
       .registerModule(new GuavaModule())
       .registerModule(new SimpleModule()
         .addSerializer(Action.class, new ActionSerializer())
-        .addDeserializer(S3Actions.class, new S3ActionsDeserializer()));
+        .addDeserializer(S3Actions.class, new ActionDeserializer<>(S3Actions.class)));
   
   @Test
   public void multipleConditions() throws Exception {
