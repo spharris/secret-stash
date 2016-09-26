@@ -14,6 +14,7 @@ public abstract class AccessControlList {
   
   AccessControlList() {}
   
+  public abstract @Nullable String getPolicyArn();
   public abstract @Nullable ImmutableList<String> getRoles();
   public abstract @Nullable ImmutableList<String> getGroups();
   
@@ -25,10 +26,11 @@ public abstract class AccessControlList {
   @AutoValue.Builder
   @JsonPOJOBuilder(buildMethodName = "build", withPrefix = "set")
   public abstract static class Builder {
-    
+
+    public abstract Builder setPolicyArn(String policyArn);
     public abstract Builder setRoles(String... roles);
     public abstract Builder setGroups(String... groups);
-    
+  
     @JsonProperty("roles") public abstract Builder setRoles(Iterable<String> roles);
     @JsonProperty("groups") public abstract Builder setGroups(Iterable<String> groups);
     

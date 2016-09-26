@@ -2,6 +2,8 @@ package io.github.spharris.stash.service;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.util.Arrays;
+
 import javax.inject.Inject;
 
 import org.junit.Before;
@@ -11,14 +13,19 @@ import org.junit.runners.JUnit4;
 
 import com.amazonaws.auth.policy.Statement.Effect;
 import com.amazonaws.auth.policy.actions.S3Actions;
-import com.amazonaws.services.s3.AmazonS3;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Iterables;
+import com.amazonaws.services.identitymanagement.AmazonIdentityManagement;
+import com.amazonaws.services.identitymanagement.model.AttachedPolicy;
+import com.amazonaws.services.identitymanagement.model.GetPolicyRequest;
+import com.amazonaws.services.identitymanagement.model.GetPolicyResult;
+import com.amazonaws.services.identitymanagement.model.ListAttachedRolePoliciesRequest;
+import com.amazonaws.services.identitymanagement.model.ListAttachedRolePoliciesResult;
+import com.google.common.base.Joiner;
 import com.google.inject.Guice;
 
 import io.github.spharris.stash.service.aws.Policy;
 import io.github.spharris.stash.service.aws.Statement;
 import io.github.spharris.stash.service.request.UpdatePolicyRequest;
+import io.github.spharris.stash.service.testing.FakeIamClient;
 import io.github.spharris.stash.service.testing.TestEntities;
 import io.github.spharris.stash.service.testing.TestModule;
 import io.github.spharris.stash.service.utils.JsonUtil;
@@ -27,7 +34,7 @@ import io.github.spharris.stash.service.utils.ObjectNameUtil;
 @RunWith(JUnit4.class)
 public class PolicyServiceImplTest {
 
-  @Inject AmazonS3 client;
+  @Inject AmazonIdentityManagement client;
   @Inject PolicyService policyService;
   @Inject JsonUtil json;
   
@@ -38,43 +45,56 @@ public class PolicyServiceImplTest {
   
   @Test
   public void createsPolicyIfNonExistant() {
-    policyService.updateEnvironmentPolicy(UpdatePolicyRequest.builder()
+    Policy policy = policyService.updateEnvironmentPolicy(UpdatePolicyRequest.builder()
       .setProjectId(TestEntities.TEST_PROJECT_ID)
       .setEnvironment(TestEntities.TEST_ENVIRONMENT)
       .build());
     
-    Policy result = json.fromString(
-      client.getBucketPolicy(TestEntities.TEST_BUCKET).getPolicyText(), Policy.class);
-    
-    assertThat(result.getStatements()).hasSize(1);
-    assertThat(result.getId()).isEqualTo(
-      TestEntities.TEST_POLICY_PREFIX + ":" + PolicyService.POLICY_ID);
-  }
-  
-  @Test
-  public void addsStatementForNewEnvironment() {    
-    Policy result = policyService.updateEnvironmentPolicy(UpdatePolicyRequest.builder()
-      .setProjectId(TestEntities.TEST_PROJECT_ID)
-      .setEnvironment(TestEntities.TEST_ENVIRONMENT)
-      .build());
+    GetPolicyResult result = client.getPolicy(new GetPolicyRequest()
+      .withPolicyArn(policy.getArn()));
     
     Policy expected = Policy.builder()
-        .setId(TestEntities.TEST_POLICY_PREFIX + ":" + PolicyService.POLICY_ID)
+        .setArn(FakeIamClient.ARN_PREFIX + TestEntities.TEST_POLICY_PATH + getPolicyName())
         .setStatements(Statement.builder()
-          .setId(TestEntities.TEST_POLICY_PREFIX + ":" + ObjectNameUtil.createS3Path(
-             TestEntities.TEST_PROJECT_ID, TestEntities.TEST_ENVIRONMENT_ID))
           .setEffect(Effect.Allow)
           .setActions(S3Actions.GetObject)
-          .setResources("arn:aws:s3:::" 
-              + TestEntities.TEST_PROJECT_ID + "/" 
-              + TestEntities.TEST_ENVIRONMENT_ID + "/*")
-          .setPrincipals(ImmutableMultimap.<String, String>builder()
-            .putAll("AWS",
-              Iterables.concat(TestEntities.TEST_ACL.getGroups(), TestEntities.TEST_ACL.getRoles()))
-            .build())
+          .setResources(ObjectNameUtil.createEnvironmentResource(TestEntities.TEST_BUCKET, 
+            TestEntities.TEST_PROJECT_ID, TestEntities.TEST_ENVIRONMENT_ID))
           .build())
         .build();
     
-    assertThat(result).isEqualTo(expected);
+    assertThat(policy).isEqualTo(expected);
+    
+    assertThat(result.getPolicy()).isNotNull();
+    assertThat(result.getPolicy().getPolicyName()).isEqualTo(getPolicyName());
+    assertThat(result.getPolicy().getPath()).isEqualTo(TestEntities.TEST_POLICY_PATH);
+  }
+  
+  @Test
+  public void attachesPolicy() {
+    Policy policy = policyService.updateEnvironmentPolicy(UpdatePolicyRequest.builder()
+      .setProjectId(TestEntities.TEST_PROJECT_ID)
+      .setEnvironment(TestEntities.TEST_ENVIRONMENT)
+      .build());
+    
+    ListAttachedRolePoliciesResult roleResult = client.listAttachedRolePolicies(
+      new ListAttachedRolePoliciesRequest()
+        .withRoleName(TestEntities.TEST_ROLE));
+    
+    ListAttachedRolePoliciesResult groupResult = client.listAttachedRolePolicies(
+      new ListAttachedRolePoliciesRequest()
+        .withRoleName(TestEntities.TEST_GROUP));
+    
+    AttachedPolicy expected = new AttachedPolicy()
+      .withPolicyArn(policy.getArn())
+      .withPolicyName(getPolicyName());
+    
+    assertThat(roleResult.getAttachedPolicies()).containsExactly(expected);
+    assertThat(groupResult.getAttachedPolicies()).containsExactly(expected);
+  }
+  
+  private static final String getPolicyName() {
+    return TestEntities.TEST_POLICY_PREFIX + Joiner.on("-").join(Arrays.asList(
+      TestEntities.TEST_PROJECT_ID, TestEntities.TEST_ENVIRONMENT_ID));
   }
 }

@@ -28,9 +28,11 @@ public class ObjectNameUtilTest {
   @Test
   public void createsEnvironmentResource() {
     assertThat(ObjectNameUtil.createEnvironmentResource(
+      TestEntities.TEST_BUCKET,
       TestEntities.TEST_PROJECT_ID,
       TestEntities.TEST_ENVIRONMENT_ID))
       .isEqualTo("arn:aws:s3:::"
+          + TestEntities.TEST_BUCKET + "/"
           + TestEntities.TEST_PROJECT_ID + "/"
           + TestEntities.TEST_ENVIRONMENT_ID + "/*");
   }

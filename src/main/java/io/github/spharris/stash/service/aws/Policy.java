@@ -2,6 +2,7 @@ package io.github.spharris.stash.service.aws;
 
 import javax.annotation.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
@@ -17,6 +18,7 @@ public abstract class Policy {
 
   public static final String DEFAULT_VERSION = "2012-10-17";
   
+  @JsonIgnore public abstract @Nullable String getArn();
   @JsonProperty("Id") public abstract @Nullable String getId();
   @JsonProperty("Version") public abstract @Nullable String getVersion(); 
   @JsonProperty("Statement") public abstract @Nullable ImmutableList<Statement> getStatements();
@@ -33,6 +35,7 @@ public abstract class Policy {
     
     public abstract Builder setStatements(Statement...statements);
     
+    @JsonIgnore public abstract Builder setArn(String arn);
     @JsonProperty("Id") public abstract Builder setId(String id);
     @JsonProperty("Version") public abstract Builder setVersion(String version);
     

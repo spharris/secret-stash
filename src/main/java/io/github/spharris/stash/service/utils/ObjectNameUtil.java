@@ -22,8 +22,9 @@ public class ObjectNameUtil {
     return key.split("/")[0];
   }
   
-  public static String createEnvironmentResource(String projectId, String environmentId) {
-    return AWS_S3_NAMESPACE + createS3Path(projectId, environmentId) + "*";
+  public static String createEnvironmentResource(String bucketName, String projectId,
+      String environmentId) {
+    return AWS_S3_NAMESPACE + bucketName + "/" + createS3Path(projectId, environmentId) + "*";
   }
   
   public static String createS3Path(String projectId, String environmentId) {

@@ -17,7 +17,7 @@ import com.google.common.collect.Multimap;
 
 public class FakeIamClient implements AmazonIdentityManagement {
 
-  private static final String ARN_PREFIX = "arn:aws:iam::" + TestEntities.TEST_POLICY_ACCOUNT
+  public static final String ARN_PREFIX = "arn:aws:iam::" + TestEntities.TEST_POLICY_ACCOUNT
       + ":policy";
   
   // Maps groups/roles to attached policies

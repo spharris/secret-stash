@@ -18,5 +18,9 @@ public class Annotations {
   
   @Qualifier
   @Retention(RetentionPolicy.RUNTIME)
+  public @interface PolicyPath {}
+  
+  @Qualifier
+  @Retention(RetentionPolicy.RUNTIME)
   public @interface PolicyPrefix {}
 }

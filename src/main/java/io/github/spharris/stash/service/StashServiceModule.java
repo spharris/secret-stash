@@ -3,7 +3,8 @@ package io.github.spharris.stash.service;
 import com.amazonaws.auth.policy.Action;
 import com.amazonaws.auth.policy.actions.IdentityManagementActions;
 import com.amazonaws.auth.policy.actions.S3Actions;
-import com.amazonaws.regions.Regions;
+import com.amazonaws.services.identitymanagement.AmazonIdentityManagement;
+import com.amazonaws.services.identitymanagement.AmazonIdentityManagementClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -15,6 +16,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 
 import io.github.spharris.stash.service.Annotations.BucketOfSecrets;
+import io.github.spharris.stash.service.Annotations.PolicyPath;
 import io.github.spharris.stash.service.Annotations.PolicyPrefix;
 import io.github.spharris.stash.service.aws.ActionDeserializer;
 import io.github.spharris.stash.service.aws.ActionSerializer;
@@ -28,11 +30,14 @@ public class StashServiceModule extends AbstractModule {
   protected void configure() {
     
     bind(AmazonS3.class).toInstance(AmazonS3ClientBuilder.standard()
-      .withRegion(Regions.US_WEST_2)
       .build());
+    
+    bind(AmazonIdentityManagement.class).toInstance(
+      AmazonIdentityManagementClientBuilder.standard().build());
 
     bind(Key.get(String.class, BucketOfSecrets.class)).toInstance("spharris.secrets");
-    bind(Key.get(String.class, PolicyPrefix.class)).toInstance("secret-stash");
+    bind(Key.get(String.class, PolicyPath.class)).toInstance("/secret-stash/");
+    bind(Key.get(String.class, PolicyPrefix.class)).toInstance("Stash+");
     
     bind(ProjectService.class).to(ProjectServiceImpl.class);
     bind(EnvironmentService.class).to(EnvironmentServiceImpl.class);

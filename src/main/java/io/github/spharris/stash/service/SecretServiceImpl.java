@@ -3,7 +3,6 @@ package io.github.spharris.stash.service;
 import javax.inject.Inject;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.AccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.google.common.collect.ImmutableList;
 

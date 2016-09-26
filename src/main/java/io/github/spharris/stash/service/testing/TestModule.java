@@ -3,6 +3,7 @@ package io.github.spharris.stash.service.testing;
 import com.amazonaws.auth.policy.Action;
 import com.amazonaws.auth.policy.actions.IdentityManagementActions;
 import com.amazonaws.auth.policy.actions.S3Actions;
+import com.amazonaws.services.identitymanagement.AmazonIdentityManagement;
 import com.amazonaws.services.s3.AmazonS3;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -13,6 +14,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 
 import io.github.spharris.stash.service.Annotations.BucketOfSecrets;
+import io.github.spharris.stash.service.Annotations.PolicyPath;
 import io.github.spharris.stash.service.Annotations.PolicyPrefix;
 import io.github.spharris.stash.service.EnvironmentService;
 import io.github.spharris.stash.service.EnvironmentServiceImpl;
@@ -34,6 +36,7 @@ public class TestModule extends AbstractModule {
   @Override
   protected void configure() {
     bind(Key.get(String.class, BucketOfSecrets.class)).toInstance(TestEntities.TEST_BUCKET);
+    bind(Key.get(String.class, PolicyPath.class)).toInstance(TestEntities.TEST_POLICY_PATH);
     bind(Key.get(String.class, PolicyPrefix.class)).toInstance(TestEntities.TEST_POLICY_PREFIX);
     
     bind(ProjectService.class).to(ProjectServiceImpl.class);
@@ -42,6 +45,7 @@ public class TestModule extends AbstractModule {
     bind(PolicyService.class).to(PolicyServiceImpl.class);
     
     bind(AmazonS3.class).toInstance(new FakeS3Client());
+    bind(AmazonIdentityManagement.class).toInstance(new FakeIamClient());
     bind(ObjectMapper.class).toInstance(new ObjectMapper()
       .setSerializationInclusion(Include.NON_NULL)
       .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)

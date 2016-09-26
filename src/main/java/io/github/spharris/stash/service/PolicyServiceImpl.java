@@ -1,22 +1,22 @@
  package io.github.spharris.stash.service;
 
-import java.util.stream.Collectors;
+import java.util.Arrays;
 
 import javax.inject.Inject;
 
 import com.amazonaws.auth.policy.Statement.Effect;
 import com.amazonaws.auth.policy.actions.S3Actions;
+import com.amazonaws.services.identitymanagement.AmazonIdentityManagement;
+import com.amazonaws.services.identitymanagement.model.AttachGroupPolicyRequest;
+import com.amazonaws.services.identitymanagement.model.AttachRolePolicyRequest;
+import com.amazonaws.services.identitymanagement.model.CreatePolicyRequest;
+import com.amazonaws.services.identitymanagement.model.CreatePolicyResult;
 import com.amazonaws.services.identitymanagement.model.DeletePolicyRequest;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.BucketPolicy;
-import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMultimap;
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 
-import io.github.spharris.stash.Environment;
 import io.github.spharris.stash.service.Annotations.BucketOfSecrets;
+import io.github.spharris.stash.service.Annotations.PolicyPath;
 import io.github.spharris.stash.service.Annotations.PolicyPrefix;
 import io.github.spharris.stash.service.aws.Policy;
 import io.github.spharris.stash.service.aws.Statement;
@@ -26,52 +26,50 @@ import io.github.spharris.stash.service.utils.ObjectNameUtil;
 
 public class PolicyServiceImpl implements PolicyService {
   
-  private static final String AWS_ENTITY = "AWS";
   private static final ImmutableSet<S3Actions> ACTIONS = ImmutableSet.of(S3Actions.GetObject);
   
   private final String bucketName;
   private final String policyPrefix;
-  private final AmazonS3 s3client;
+  private final String policyPath;
+  private final AmazonIdentityManagement iamClient;
   private final JsonUtil json;
   
   @Inject
-  PolicyServiceImpl(@BucketOfSecrets String bucketName, @PolicyPrefix String policyPrefix,
-      AmazonS3 s3client, JsonUtil json) {
+  PolicyServiceImpl(@BucketOfSecrets String bucketName, @PolicyPath String policyPath, 
+      @PolicyPrefix String policyPrefix, AmazonIdentityManagement iamClient, JsonUtil json) {
     this.bucketName = bucketName;
     this.policyPrefix = policyPrefix;
-    this.s3client = s3client;
+    this.policyPath = policyPath;
+    this.iamClient = iamClient;
     this.json = json;
   }
 
   @Override
-  public synchronized Policy updateEnvironmentPolicy(UpdatePolicyRequest request) {
-    BucketPolicy bucketPolicy = s3client.getBucketPolicy(bucketName);
-
-    ImmutableList.Builder<Statement> statementListBuilder = ImmutableList.builder();
-    Policy.Builder policyBuilder;
-    if (bucketPolicy.getPolicyText() == null) {
-      policyBuilder = createPolicyTemplate();
-    } else {
-      Policy currentPolicy = json.fromString(bucketPolicy.getPolicyText(), Policy.class);
-      policyBuilder = currentPolicy.toBuilder();
-      
-      statementListBuilder.addAll(currentPolicy.getStatements().stream()
-        .filter((statement) -> {
-          // Filter out the statement for the environment we're updating.
-          return Objects.equal(statement.getId(), getStatementId(
-            request.getProjectId(), request.getEnvironment().getEnvironmentId()));
-        })
-        .collect(Collectors.toList()));
+  public Policy updateEnvironmentPolicy(UpdatePolicyRequest request) {
+    Policy policy = createPolicy(request.getProjectId(),
+      request.getEnvironment().getEnvironmentId());
+    
+    CreatePolicyResult result = iamClient.createPolicy(new CreatePolicyRequest()
+      .withPath(policyPath)
+      .withPolicyName(createPolicyName(
+        request.getProjectId(), request.getEnvironment().getEnvironmentId()))
+      .withPolicyDocument(json.toString(policy)));
+    
+    for (String arn : request.getEnvironment().getAcl().getGroups()) { 
+      iamClient.attachGroupPolicy(new AttachGroupPolicyRequest()
+        .withGroupName(arn)
+        .withPolicyArn(result.getPolicy().getArn()));
     }
     
-    Policy policy = policyBuilder
-        .setStatements(statementListBuilder
-          .add(getEnvironmentStatement(request.getProjectId(), request.getEnvironment()))
-          .build())
-        .build();
-    s3client.setBucketPolicy(bucketName, json.toString(policy));
+    for (String arn : request.getEnvironment().getAcl().getRoles()) { 
+      iamClient.attachRolePolicy(new AttachRolePolicyRequest()
+        .withRoleName(arn)
+        .withPolicyArn(result.getPolicy().getArn()));
+    }
     
-    return policy;
+    return policy.toBuilder()
+        .setArn(result.getPolicy().getArn())
+        .build();
   }
 
   @Override
@@ -80,27 +78,18 @@ public class PolicyServiceImpl implements PolicyService {
     
   }
   
-  private Statement getEnvironmentStatement(String projectId, Environment environment) {
-    return Statement.builder()
-        .setId(getStatementId(projectId, environment.getEnvironmentId()))
-        .setActions(ACTIONS)
-        .setEffect(Effect.Allow)
-        .setResources(
-          ObjectNameUtil.createEnvironmentResource(projectId, environment.getEnvironmentId()))
-        .setPrincipals(ImmutableMultimap.<String, String>builder()
-          .putAll(AWS_ENTITY,
-            Iterables.concat(environment.getAcl().getGroups(), environment.getAcl().getRoles()))
+  private Policy createPolicy(String projectId, String environmentId) {
+    return Policy.builder()
+        .setStatements(Statement.builder()
+          .setEffect(Effect.Allow)
+          .setActions(ACTIONS)
+          .setResources(
+            ObjectNameUtil.createEnvironmentResource(bucketName, projectId, environmentId))
           .build())
         .build();
   }
   
-  private String getStatementId(String projectId, String environmentId) {
-    return String.format(
-      "%s:%s", policyPrefix, ObjectNameUtil.createS3Path(projectId, environmentId));
-  }
-  
-  private Policy.Builder createPolicyTemplate() {
-    return Policy.builder()
-        .setId(policyPrefix + ":" + PolicyService.POLICY_ID);
+  private String createPolicyName(String projectId, String environmentId) {
+    return policyPrefix + Joiner.on("-").join(Arrays.asList(projectId, environmentId));
   }
 }
