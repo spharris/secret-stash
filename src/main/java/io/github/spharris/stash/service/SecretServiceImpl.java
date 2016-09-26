@@ -1,5 +1,8 @@
 package io.github.spharris.stash.service;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+
 import javax.inject.Inject;
 
 import com.amazonaws.services.s3.AmazonS3;
@@ -39,14 +42,17 @@ public class SecretServiceImpl implements SecretService {
   @Override
   public Secret createSecret(CreateSecretRequest request) {
     // TODO(spharris): Case where project/environment don't exist
+    byte[] secretBytes = json.toString(request.getSecret()).getBytes(StandardCharsets.UTF_8);
+    
     ObjectMetadata meta = new ObjectMetadata();
     meta.setSSEAlgorithm(ObjectMetadata.AES_256_SERVER_SIDE_ENCRYPTION);
-    
+    meta.setContentLength(secretBytes.length);
+     
     s3client.putObject(bucketName, ObjectNameUtil.createS3Path(
       request.getProjectId(),
       request.getEnvironmentId(),
       request.getSecret().getSecretId()),
-      json.toInputStream(request.getSecret()),
+      new ByteArrayInputStream(secretBytes),
       meta);
     
     return request.getSecret();
