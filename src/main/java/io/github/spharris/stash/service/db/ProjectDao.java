@@ -1,5 +1,7 @@
 package io.github.spharris.stash.service.db;
 
+import java.util.Optional;
+
 import com.google.common.collect.ImmutableList;
 
 import io.github.spharris.stash.Project;
@@ -13,7 +15,7 @@ public interface ProjectDao {
 
   ImmutableList<Project> listProjects(ListProjectsRequest request);
   Project createProject(CreateProjectRequest request);
-  Project getProject(GetProjectRequest request);
+  Optional<Project> getProject(GetProjectRequest request);
   Project updateProject(UpdateProjectRequest request);
   void deleteProject(DeleteProjectRequest request);
 }
