@@ -15,7 +15,7 @@ import com.google.inject.Guice;
 import io.github.spharris.stash.Environment;
 import io.github.spharris.stash.service.request.CreateEnvironmentRequest;
 import io.github.spharris.stash.service.testing.TestEntities;
-import io.github.spharris.stash.service.testing.TestModule;
+import io.github.spharris.stash.service.testing.TestServiceModule;
 import io.github.spharris.stash.service.utils.JsonUtil;
 import io.github.spharris.stash.service.utils.ObjectNameUtil;
 
@@ -28,7 +28,7 @@ public class EnvironmentServiceImplTest {
   
   @Before
   public void createInjector() {
-    Guice.createInjector(new TestModule()).injectMembers(this);
+    Guice.createInjector(new TestServiceModule()).injectMembers(this);
   }
   
   @Test

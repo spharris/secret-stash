@@ -23,7 +23,7 @@ import com.google.inject.Guice;
 import io.github.spharris.stash.Secret;
 import io.github.spharris.stash.service.request.CreateSecretRequest;
 import io.github.spharris.stash.service.testing.TestEntities;
-import io.github.spharris.stash.service.testing.TestModule;
+import io.github.spharris.stash.service.testing.TestServiceModule;
 import io.github.spharris.stash.service.utils.JsonUtil;
 import io.github.spharris.stash.service.utils.ObjectNameUtil;
 
@@ -36,7 +36,7 @@ public class SecretServiceImplTest {
   
   @Before
   public void createInjector() {
-    Guice.createInjector(new TestModule()).injectMembers(this);
+    Guice.createInjector(new TestServiceModule()).injectMembers(this);
   }
   
   @Test

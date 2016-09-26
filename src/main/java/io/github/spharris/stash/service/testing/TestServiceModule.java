@@ -31,7 +31,7 @@ import io.github.spharris.stash.service.utils.JsonUtil;
 /**
  * Bindings to be used for tests 
  */
-public class TestModule extends AbstractModule {
+public class TestServiceModule extends AbstractModule {
   
   @Override
   protected void configure() {

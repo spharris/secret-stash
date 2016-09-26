@@ -9,7 +9,7 @@ import io.github.spharris.stash.service.request.GetProjectRequest;
 import io.github.spharris.stash.service.request.ListProjectsRequest;
 import io.github.spharris.stash.service.request.UpdateProjectRequest;
 
-public interface PolicyDao {
+public interface ProjectDao {
 
   ImmutableList<Project> listProjects(ListProjectsRequest request);
   Project createProject(CreateProjectRequest request);

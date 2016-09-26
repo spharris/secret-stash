@@ -16,7 +16,7 @@ import org.junit.rules.ExpectedException;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Guice;
 
-import io.github.spharris.stash.service.testing.TestModule;
+import io.github.spharris.stash.service.testing.TestServiceModule;
 
 public class JsonUtilTest {
 
@@ -26,7 +26,7 @@ public class JsonUtilTest {
   
   @Before
   public void createInjector() {
-    Guice.createInjector(new TestModule()).injectMembers(this);
+    Guice.createInjector(new TestServiceModule()).injectMembers(this);
   }
   
   @Test
