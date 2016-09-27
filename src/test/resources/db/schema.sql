@@ -17,7 +17,7 @@ CREATE TABLE environment (
 );
 
 CREATE TABLE secret (
-       project_id VARCHAR(255) NOT NULL, 
+       project_id VARCHAR(255) NOT NULL,
        environment_id VARCHAR(255) NOT NULL,
        secret_id VARCHAR(255) NOT NULL,
        description TEXT,

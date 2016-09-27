@@ -8,7 +8,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.sqlite.SQLiteConfig;
-import org.sqlite.javax.SQLitePooledConnection;
 
 import io.github.spharris.stash.service.db.Annotations.DatabaseFile;
 
@@ -16,13 +15,12 @@ import io.github.spharris.stash.service.db.Annotations.DatabaseFile;
 public class DatabaseServiceImpl implements DatabaseService {
 
   private final String dbFile;
+  private Connection connection;
 
   @Inject
   DatabaseServiceImpl(@DatabaseFile String dbFile) {
     this.dbFile = dbFile;
   }
-  
-  private Connection connection;
 
   @Override
   public Connection getConnection() {
