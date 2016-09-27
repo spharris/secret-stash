@@ -22,7 +22,7 @@ public class ProjectDaoImpl implements ProjectDao {
   private final DatabaseService dbService;
   
   @Inject
-  public ProjectDaoImpl(DatabaseService dbService) {
+  ProjectDaoImpl(DatabaseService dbService) {
     this.dbService = dbService;
   }
   

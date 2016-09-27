@@ -26,6 +26,16 @@ public class TestEntities {
       .build();
 
   /*
+   * Policy-related entities
+   */
+  public static final String TEST_POLICY_NAME = "test-policy-name";
+  public static final String TEST_POLICY_ID = "test-policy-id";
+  public static final String TEST_POLICY_PATH = "/test/policy/path/";
+  public static final String TEST_POLICY_PREFIX = "test-policy-prefix";
+  public static final String TEST_POLICY_ARN = "test-policy-arn";
+  public static final String TEST_POLICY_ACCOUNT = "12345";
+  
+  /*
    * Environment-related entities
    */
   public static final String TEST_ENVIRONMENT_ID = "test-environment";
@@ -34,6 +44,7 @@ public class TestEntities {
   public static final String TEST_GROUP = "test-group-arn";
   
   public static final AccessControlList TEST_ACL = AccessControlList.builder()
+      .setPolicyArn(TEST_POLICY_ARN)
       .setGroups(TEST_GROUP)
       .setRoles(TEST_ROLE)
       .build();
@@ -56,14 +67,4 @@ public class TestEntities {
       .setDescription(TEST_SECRET_DESCRIPTION)
       .setSecretValue(TEST_SECRET_VALUE)
       .build();
-  
-  /*
-   * Policy-related entities
-   */
-  public static final String TEST_POLICY_NAME = "test-policy-name";
-  public static final String TEST_POLICY_ID = "test-policy-id";
-  public static final String TEST_POLICY_PATH = "/test/policy/path/";
-  public static final String TEST_POLICY_PREFIX = "test-policy-prefix";
-  public static final String TEST_POLICY_ARN = "test-policy-arn";
-  public static final String TEST_POLICY_ACCOUNT = "12345";
 }
