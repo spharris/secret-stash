@@ -7,6 +7,9 @@ import java.sql.SQLException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.sqlite.SQLiteConfig;
+import org.sqlite.javax.SQLitePooledConnection;
+
 import io.github.spharris.stash.service.db.Annotations.DatabaseFile;
 
 @Singleton
@@ -32,7 +35,9 @@ public class DatabaseServiceImpl implements DatabaseService {
 
   @Override
   public void start() throws SQLException {
-    connection = DriverManager.getConnection("jdbc:sqlite:" + dbFile);
+    SQLiteConfig config = new SQLiteConfig();
+    config.enforceForeignKeys(true);
+    connection = DriverManager.getConnection("jdbc:sqlite:" + dbFile, config.toProperties());
   }
 
   @Override

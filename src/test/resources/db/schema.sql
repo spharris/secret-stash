@@ -4,23 +4,24 @@ CREATE TABLE project (
 );
 
 CREATE TABLE environment (
-       project_id VARCHAR(255) NOT NULL,
+       project_id VARCHAR(255) NOT NULL REFERENCES project(project_id) ON DELETE CASCADE,
        environment_id VARCHAR(255) NOT NULL,
        description TEXT,
 
        -- ACL-related items
        policy_arn VARCHAR(255) NOT NULL,
        roles TEXT DEFAULT '',
-       groups TEXT DEFAULT ''
-);
+       groups TEXT DEFAULT '',
 
-CREATE UNIQUE INDEX idx_env_key ON environment (project_id, environment_id);
+       PRIMARY KEY(project_id, environment_id)
+);
 
 CREATE TABLE secret (
-       project_id VARCHAR(255) NOT NULL,
+       project_id VARCHAR(255) NOT NULL, 
        environment_id VARCHAR(255) NOT NULL,
        secret_id VARCHAR(255) NOT NULL,
-       description TEXT
-);
+       description TEXT,
 
-CREATE UNIQUE INDEX idx_secret_key ON secret (project_id, environment_id, secret_id);
+       PRIMARY KEY(project_id, environment_id, secret_id),
+       FOREIGN KEY(project_id, environment_id) REFERENCES environment(project_id, environment_id) ON DELETE CASCADE
+);

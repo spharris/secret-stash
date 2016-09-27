@@ -18,10 +18,16 @@ import org.junit.runners.JUnit4;
 
 import com.google.common.collect.ImmutableList;
 
+import io.github.spharris.stash.Environment;
 import io.github.spharris.stash.Project;
+import io.github.spharris.stash.Secret;
+import io.github.spharris.stash.service.request.CreateEnvironmentRequest;
 import io.github.spharris.stash.service.request.CreateProjectRequest;
+import io.github.spharris.stash.service.request.CreateSecretRequest;
 import io.github.spharris.stash.service.request.DeleteProjectRequest;
+import io.github.spharris.stash.service.request.GetEnvironmentRequest;
 import io.github.spharris.stash.service.request.GetProjectRequest;
+import io.github.spharris.stash.service.request.GetSecretRequest;
 import io.github.spharris.stash.service.request.ListProjectsRequest;
 import io.github.spharris.stash.service.testing.TestEntities;
 
@@ -29,6 +35,8 @@ import io.github.spharris.stash.service.testing.TestEntities;
 public class ProjectDaoImplTest extends BaseDaoTest {
 
   @Inject ProjectDao projectDao;
+  @Inject EnvironmentDao environmentDao;
+  @Inject SecretDao secretDao;
   
   @Rule public ExpectedException thrown = ExpectedException.none();
 
@@ -137,5 +145,42 @@ public class ProjectDaoImplTest extends BaseDaoTest {
       .build());
     
     assertThat(result.isPresent()).isFalse();
+  }
+  
+  @Test
+  public void cascadeDeletes() throws Exception {
+    projectDao.createProject(CreateProjectRequest.builder()
+      .setProject(TestEntities.TEST_PROJECT)
+      .build());
+    
+    environmentDao.createEnvironment(CreateEnvironmentRequest.builder()
+      .setProjectId(TestEntities.TEST_PROJECT_ID)
+      .setEnvironment(TestEntities.TEST_ENVIRONMENT)
+      .build());
+
+    secretDao.createSecret(CreateSecretRequest.builder()
+      .setProjectId(TestEntities.TEST_PROJECT_ID)
+      .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
+      .setSecret(TestEntities.TEST_SECRET)
+      .build());
+    
+    projectDao.deleteProject(DeleteProjectRequest.builder()
+      .setProjectId(TestEntities.TEST_PROJECT_ID)
+      .build());
+    
+    Optional<Secret> secret = secretDao.getSecret(GetSecretRequest.builder()
+      .setProjectId(TestEntities.TEST_PROJECT_ID)
+      .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
+      .setSecretId(TestEntities.TEST_SECRET_ID)
+      .build());
+    
+    Optional<Environment> environment = environmentDao.getEnvironment(
+      GetEnvironmentRequest.builder()
+        .setProjectId(TestEntities.TEST_PROJECT_ID)
+        .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
+        .build());
+    
+    assertThat(secret.isPresent()).isFalse();
+    assertThat(environment.isPresent()).isFalse();
   }
 }

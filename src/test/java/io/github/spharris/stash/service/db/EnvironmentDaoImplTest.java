@@ -77,6 +77,16 @@ public class EnvironmentDaoImplTest extends BaseDaoTest {
       .setEnvironment(TestEntities.TEST_ENVIRONMENT)
       .build());
   }
+
+  @Test
+  public void errorOnNonExistantProject() throws Exception {
+    thrown.expect(RuntimeException.class);
+
+    environmentDao.createEnvironment(CreateEnvironmentRequest.builder()
+      .setProjectId("another-project")
+      .setEnvironment(TestEntities.TEST_ENVIRONMENT)
+      .build());
+  }
   
   @Test
   public void getsEnvironment() throws Exception {

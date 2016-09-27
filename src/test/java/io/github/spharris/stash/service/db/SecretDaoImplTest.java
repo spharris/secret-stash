@@ -95,6 +95,28 @@ public class SecretDaoImplTest extends BaseDaoTest {
   }
   
   @Test
+  public void errorOnNonExistantProject() throws Exception {
+    thrown.expect(RuntimeException.class);
+
+    secretDao.createSecret(CreateSecretRequest.builder()
+      .setProjectId("another-project")
+      .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
+      .setSecret(TestEntities.TEST_SECRET)
+      .build());
+  }
+  
+  @Test
+  public void errorOnNonExistantEnvironment() throws Exception {
+    thrown.expect(RuntimeException.class);
+
+    secretDao.createSecret(CreateSecretRequest.builder()
+      .setProjectId(TestEntities.TEST_PROJECT_ID)
+      .setEnvironmentId("another-environment")
+      .setSecret(TestEntities.TEST_SECRET)
+      .build());
+  }
+  
+  @Test
   public void getsSecret() throws Exception {
     secretDao.createSecret(CreateSecretRequest.builder()
       .setProjectId(TestEntities.TEST_PROJECT_ID)
@@ -113,8 +135,7 @@ public class SecretDaoImplTest extends BaseDaoTest {
       .setSecretValue(null)
       .build());
   }
-  
-  
+
   @Test
   public void getNullDescription() throws Exception {
     Secret expected = Secret.builder()
