@@ -15,3 +15,12 @@ CREATE TABLE environment (
 );
 
 CREATE UNIQUE INDEX idx_env_key ON environment (project_id, environment_id);
+
+CREATE TABLE secret (
+       project_id VARCHAR(255) NOT NULL,
+       environment_id VARCHAR(255) NOT NULL,
+       secret_id VARCHAR(255) NOT NULL,
+       description TEXT
+);
+
+CREATE UNIQUE INDEX idx_secret_key ON secret (project_id, environment_id, secret_id);

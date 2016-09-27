@@ -66,7 +66,7 @@ public class EnvironmentDaoImpl implements EnvironmentDao {
       throw new RuntimeException(e);
     }
     
-    return request.getEnvironment();
+    return environment;
   }
 
   @Override

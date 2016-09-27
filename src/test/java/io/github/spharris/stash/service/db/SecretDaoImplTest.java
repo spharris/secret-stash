@@ -19,95 +19,118 @@ import org.junit.runners.JUnit4;
 
 import com.google.common.collect.ImmutableList;
 
-import io.github.spharris.stash.AccessControlList;
-import io.github.spharris.stash.Environment;
+import io.github.spharris.stash.Secret;
 import io.github.spharris.stash.service.request.CreateEnvironmentRequest;
 import io.github.spharris.stash.service.request.CreateProjectRequest;
-import io.github.spharris.stash.service.request.DeleteEnvironmentRequest;
-import io.github.spharris.stash.service.request.GetEnvironmentRequest;
-import io.github.spharris.stash.service.request.ListEnvironmentsRequest;
+import io.github.spharris.stash.service.request.CreateSecretRequest;
+import io.github.spharris.stash.service.request.DeleteSecretRequest;
+import io.github.spharris.stash.service.request.GetSecretRequest;
+import io.github.spharris.stash.service.request.ListSecretsRequest;
 import io.github.spharris.stash.service.testing.TestEntities;
 
 @RunWith(JUnit4.class)
-public class EnvironmentDaoImplTest extends BaseDaoTest { 
+public class SecretDaoImplTest extends BaseDaoTest {
 
+  @Inject SecretDao secretDao;
   @Inject EnvironmentDao environmentDao;
   @Inject ProjectDao projectDao;
   
   @Rule public ExpectedException thrown = ExpectedException.none();
 
   @Before
+  public void initializeData() {
+    createProject();
+    createEnvironment();
+  }
+  
   public void createProject() {
     projectDao.createProject(CreateProjectRequest.builder()
       .setProject(TestEntities.TEST_PROJECT)
       .build());
   }
   
-  @Test
-  public void insertsEnvironment() throws Exception {
+  public void createEnvironment() {
     environmentDao.createEnvironment(CreateEnvironmentRequest.builder()
       .setProjectId(TestEntities.TEST_PROJECT_ID)
       .setEnvironment(TestEntities.TEST_ENVIRONMENT)
       .build());
+  }
+  
+  @Test
+  public void insertsSecret() throws Exception {
+    secretDao.createSecret(CreateSecretRequest.builder()
+      .setProjectId(TestEntities.TEST_PROJECT_ID)
+      .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
+      .setSecret(TestEntities.TEST_SECRET)
+      .build());
     
     Statement statement = dbService.getConnection().createStatement();
-    ResultSet rs = statement.executeQuery("select * from environment;");
+    ResultSet rs = statement.executeQuery("select * from secret;");
     
     assertThat(rs.isBeforeFirst()).isTrue();
     
     rs.next();
     assertThat(rs.getString("project_id")).isEqualTo(TestEntities.TEST_PROJECT_ID);
     assertThat(rs.getString("environment_id")).isEqualTo(TestEntities.TEST_ENVIRONMENT_ID);
-    assertThat(rs.getString("description")).isEqualTo(TestEntities.TEST_ENVIRONMENT_DESCRIPTION);
-    assertThat(rs.getString("roles")).isEqualTo(TestEntities.TEST_ROLE);
-    assertThat(rs.getString("groups")).isEqualTo(TestEntities.TEST_GROUP);
+    assertThat(rs.getString("secret_id")).isEqualTo(TestEntities.TEST_SECRET_ID);
+    assertThat(rs.getString("description")).isEqualTo(TestEntities.TEST_SECRET_DESCRIPTION);
   }
   
+  
   @Test
-  public void errorOnDuplicateEnvironment() throws Exception {
-    environmentDao.createEnvironment(CreateEnvironmentRequest.builder()
+  public void errorOnDuplicateSecret() throws Exception {
+    secretDao.createSecret(CreateSecretRequest.builder()
       .setProjectId(TestEntities.TEST_PROJECT_ID)
-      .setEnvironment(TestEntities.TEST_ENVIRONMENT)
+      .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
+      .setSecret(TestEntities.TEST_SECRET)
       .build());
     
     thrown.expect(RuntimeException.class);
     
-    environmentDao.createEnvironment(CreateEnvironmentRequest.builder()
+    secretDao.createSecret(CreateSecretRequest.builder()
       .setProjectId(TestEntities.TEST_PROJECT_ID)
-      .setEnvironment(TestEntities.TEST_ENVIRONMENT)
+      .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
+      .setSecret(TestEntities.TEST_SECRET)
       .build());
   }
   
   @Test
-  public void getsEnvironment() throws Exception {
-    environmentDao.createEnvironment(CreateEnvironmentRequest.builder()
-      .setProjectId(TestEntities.TEST_PROJECT_ID)
-      .setEnvironment(TestEntities.TEST_ENVIRONMENT)
-      .build());
-    
-    Environment result = environmentDao.getEnvironment(GetEnvironmentRequest.builder()
+  public void getsSecret() throws Exception {
+    secretDao.createSecret(CreateSecretRequest.builder()
       .setProjectId(TestEntities.TEST_PROJECT_ID)
       .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
+      .setSecret(TestEntities.TEST_SECRET)
+      .build());
+    
+    Secret result = secretDao.getSecret(GetSecretRequest.builder()
+      .setProjectId(TestEntities.TEST_PROJECT_ID)
+      .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
+      .setSecretId(TestEntities.TEST_SECRET_ID)
       .build()).get();
     
-    assertThat(result).isEqualTo(TestEntities.TEST_ENVIRONMENT);
+    // Sqlite DB does NOT contain the actual secret value
+    assertThat(result).isEqualTo(TestEntities.TEST_SECRET.toBuilder()
+      .setSecretValue(null)
+      .build());
   }
+  
   
   @Test
   public void getNullDescription() throws Exception {
-    Environment expected = Environment.builder()
-        .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
-        .setAcl(TestEntities.TEST_ACL)
+    Secret expected = Secret.builder()
+        .setSecretId(TestEntities.TEST_SECRET_ID)
         .build();
     
-    environmentDao.createEnvironment(CreateEnvironmentRequest.builder()
-      .setProjectId(TestEntities.TEST_PROJECT_ID)
-      .setEnvironment(expected)
-      .build());
-    
-    Environment result = environmentDao.getEnvironment(GetEnvironmentRequest.builder()
+    secretDao.createSecret(CreateSecretRequest.builder()
       .setProjectId(TestEntities.TEST_PROJECT_ID)
       .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
+      .setSecret(expected)
+      .build());
+    
+    Secret result = secretDao.getSecret(GetSecretRequest.builder()
+      .setProjectId(TestEntities.TEST_PROJECT_ID)
+      .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
+      .setSecretId(TestEntities.TEST_SECRET_ID)
       .build()).get();
     
     assertThat(result).isEqualTo(expected);
@@ -115,32 +138,34 @@ public class EnvironmentDaoImplTest extends BaseDaoTest {
   
   @Test
   public void returnsOptionalAbsent() throws Exception {    
-    Optional<Environment> result = environmentDao.getEnvironment(GetEnvironmentRequest.builder()
+    Optional<Secret> result = secretDao.getSecret(GetSecretRequest.builder()
       .setProjectId(TestEntities.TEST_PROJECT_ID)
       .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
+      .setSecretId(TestEntities.TEST_SECRET_ID)
       .build());
     
     assertThat(result.isPresent()).isFalse();
   }
   
   @Test
-  public void listsEnvironments() throws Exception {
-    ImmutableList<Environment> expected = ImmutableList.copyOf(IntStream.range(0, 2)
+  public void listsSecrets() throws Exception {
+    ImmutableList<Secret> expected = ImmutableList.copyOf(IntStream.range(0, 2)
       .mapToObj((value) ->  {
-        return environmentDao.createEnvironment(CreateEnvironmentRequest.builder()
+        return secretDao.createSecret(CreateSecretRequest.builder()
           .setProjectId(TestEntities.TEST_PROJECT_ID)
-          .setEnvironment(Environment.builder()
-            .setEnvironmentId("environment-" + value)
+          .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
+          .setSecret(Secret.builder()
+            .setSecretId("secret-" + value)
             .setDescription("description-" + value)
-            .setAcl(TestEntities.TEST_ACL)
             .build())
           .build());
       })
       .collect(Collectors.toList()));
            
-    ImmutableList<Environment> result = environmentDao.listEnvironments(
-      ListEnvironmentsRequest.builder()
+    ImmutableList<Secret> result = secretDao.listSecrets(
+      ListSecretsRequest.builder()
         .setProjectId(TestEntities.TEST_PROJECT_ID)
+        .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
         .build());
     
     assertThat(result).isEqualTo(expected);
@@ -148,59 +173,53 @@ public class EnvironmentDaoImplTest extends BaseDaoTest {
   
   @Test
   public void returnsEmptyList() throws Exception {
-    ImmutableList<Environment> expected = ImmutableList.of();
-    ImmutableList<Environment> result = environmentDao.listEnvironments(
-      ListEnvironmentsRequest.builder()
+    ImmutableList<Secret> expected = ImmutableList.of();
+    ImmutableList<Secret> result = secretDao.listSecrets(
+      ListSecretsRequest.builder()
         .setProjectId(TestEntities.TEST_PROJECT_ID)
+        .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
         .build());
     
     assertThat(result).isEqualTo(expected);
   }
   
   @Test
-  public void deletesEnvironment() throws Exception {
-    environmentDao.createEnvironment(CreateEnvironmentRequest.builder()
-      .setProjectId(TestEntities.TEST_PROJECT_ID)
-      .setEnvironment(TestEntities.TEST_ENVIRONMENT)
-      .build());
-    
-    environmentDao.deleteEnvironment(DeleteEnvironmentRequest.builder()
+  public void deletesSecret() throws Exception {
+    secretDao.createSecret(CreateSecretRequest.builder()
       .setProjectId(TestEntities.TEST_PROJECT_ID)
       .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
+      .setSecret(TestEntities.TEST_SECRET)
       .build());
     
-    Optional<Environment> result = environmentDao.getEnvironment(GetEnvironmentRequest.builder()
+    secretDao.deleteSecret(DeleteSecretRequest.builder()
       .setProjectId(TestEntities.TEST_PROJECT_ID)
       .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
+      .setSecretId(TestEntities.TEST_SECRET_ID)
+      .build());
+    
+    Optional<Secret> result = secretDao.getSecret(GetSecretRequest.builder()
+      .setProjectId(TestEntities.TEST_PROJECT_ID)
+      .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
+      .setSecretId(TestEntities.TEST_SECRET_ID)
       .build());
     
     assertThat(result.isPresent()).isFalse();
   }
   
   @Test
-  public void noErrorOnNonExistantEnvironmentDelete() throws Exception {
-    environmentDao.deleteEnvironment(DeleteEnvironmentRequest.builder()
+  public void noErrorOnNonExistantSecretDelete() throws Exception {
+    secretDao.deleteSecret(DeleteSecretRequest.builder()
       .setProjectId(TestEntities.TEST_PROJECT_ID)
       .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
+      .setSecretId(TestEntities.TEST_SECRET_ID)
       .build());
     
-    Optional<Environment> result = environmentDao.getEnvironment(GetEnvironmentRequest.builder()
+    Optional<Secret> result = secretDao.getSecret(GetSecretRequest.builder()
       .setProjectId(TestEntities.TEST_PROJECT_ID)
       .setEnvironmentId(TestEntities.TEST_ENVIRONMENT_ID)
+      .setSecretId(TestEntities.TEST_SECRET_ID)
       .build());
     
     assertThat(result.isPresent()).isFalse();
-  }
-  
-  @Test
-  public void errorWithoutPolicyArn() throws Exception {
-    thrown.expect(RuntimeException.class);
-    
-    environmentDao.createEnvironment(CreateEnvironmentRequest.builder()
-      .setProjectId(TestEntities.TEST_PROJECT_ID)
-      .setEnvironment(TestEntities.TEST_ENVIRONMENT.toBuilder()
-        .setAcl(AccessControlList.builder().build())
-        .build())
-      .build());
   }
 }

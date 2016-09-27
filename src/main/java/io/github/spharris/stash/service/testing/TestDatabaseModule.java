@@ -10,6 +10,8 @@ import io.github.spharris.stash.service.db.EnvironmentDao;
 import io.github.spharris.stash.service.db.EnvironmentDaoImpl;
 import io.github.spharris.stash.service.db.ProjectDao;
 import io.github.spharris.stash.service.db.ProjectDaoImpl;
+import io.github.spharris.stash.service.db.SecretDao;
+import io.github.spharris.stash.service.db.SecretDaoImpl;
 
 public class TestDatabaseModule extends AbstractModule {
 
@@ -20,5 +22,6 @@ public class TestDatabaseModule extends AbstractModule {
     bind(DatabaseService.class).to(DatabaseServiceImpl.class);
     bind(ProjectDao.class).to(ProjectDaoImpl.class);
     bind(EnvironmentDao.class).to(EnvironmentDaoImpl.class);
+    bind(SecretDao.class).to(SecretDaoImpl.class);
   }
 }
