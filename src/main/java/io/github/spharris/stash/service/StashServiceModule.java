@@ -20,6 +20,9 @@ import io.github.spharris.stash.service.Annotations.PolicyPath;
 import io.github.spharris.stash.service.Annotations.PolicyPrefix;
 import io.github.spharris.stash.service.aws.ActionDeserializer;
 import io.github.spharris.stash.service.aws.ActionSerializer;
+import io.github.spharris.stash.service.db.EnvironmentDao;
+import io.github.spharris.stash.service.db.ProjectDao;
+import io.github.spharris.stash.service.db.SecretDao;
 
 /**
  * secret-stash backend services
@@ -28,6 +31,10 @@ public class StashServiceModule extends AbstractModule {
   
   @Override
   protected void configure() {
+    
+    requireBinding(ProjectDao.class);
+    requireBinding(EnvironmentDao.class);
+    requireBinding(SecretDao.class);
     
     bind(AmazonS3.class).toInstance(AmazonS3ClientBuilder.standard()
       .build());
