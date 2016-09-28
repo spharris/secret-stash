@@ -17,6 +17,8 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 
 import io.github.spharris.stash.service.StashServiceModule;
+import io.github.spharris.stash.service.db.DatabaseService;
+import io.github.spharris.stash.service.db.StashDatabaseModule;
 
 /**
  * Server starter for secret-stash 
@@ -41,6 +43,7 @@ public final class SecretStash {
   
   private static ImmutableList<Module> getModules() {
     return ImmutableList.of(
+      new StashDatabaseModule(),
       new StashServiceModule(),
       new StashServerModule(),
       new AbstractModule() {
