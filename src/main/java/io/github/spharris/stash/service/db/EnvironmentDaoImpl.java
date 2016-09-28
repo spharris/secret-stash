@@ -13,6 +13,8 @@ import com.google.common.collect.ImmutableList;
 
 import io.github.spharris.stash.AccessControlList;
 import io.github.spharris.stash.Environment;
+import io.github.spharris.stash.service.db.exceptions.UnexpectedSqlException;
+import io.github.spharris.stash.service.db.exceptions.UniquenessConstraintException;
 import io.github.spharris.stash.service.request.CreateEnvironmentRequest;
 import io.github.spharris.stash.service.request.DeleteEnvironmentRequest;
 import io.github.spharris.stash.service.request.GetEnvironmentRequest;
@@ -44,7 +46,7 @@ public class EnvironmentDaoImpl implements EnvironmentDao {
       return builder.build();
       
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      throw new UnexpectedSqlException(e);
     }
   }
 
@@ -63,7 +65,7 @@ public class EnvironmentDaoImpl implements EnvironmentDao {
       statement.setString(6, joinPerms(environment.getAcl().getGroups()));
       statement.execute();
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      handleCreationException(e);
     }
     
     return environment;
@@ -85,7 +87,7 @@ public class EnvironmentDaoImpl implements EnvironmentDao {
       
       return Optional.of(extractEnvironment(rs));
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      throw new UnexpectedSqlException(e);
     }
   }
 
@@ -104,7 +106,7 @@ public class EnvironmentDaoImpl implements EnvironmentDao {
       statement.setString(2, request.getEnvironmentId());
       statement.execute();
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      throw new UnexpectedSqlException(e);
     }
   }
 
@@ -118,6 +120,17 @@ public class EnvironmentDaoImpl implements EnvironmentDao {
           .setGroups(splitPerms(rs.getString("groups")))
           .build())
         .build();
+  }
+
+  private static void handleCreationException(SQLException e) {
+    switch(SqliteErrorUtil.getExceptionType(e)) {
+      case FOREIGN_KEY:
+        throw new IllegalStateException("The specified project does not exist.", e);
+      case UNIQUENESS:
+        throw new UniquenessConstraintException("The specified environmentId already exists.", e);
+      default:
+        throw new UnexpectedSqlException(e);
+    }
   }
   
   private static ImmutableList<String> splitPerms(String perms) {

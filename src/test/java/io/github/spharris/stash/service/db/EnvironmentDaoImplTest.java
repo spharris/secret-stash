@@ -21,6 +21,8 @@ import com.google.common.collect.ImmutableList;
 
 import io.github.spharris.stash.AccessControlList;
 import io.github.spharris.stash.Environment;
+import io.github.spharris.stash.service.db.exceptions.UnexpectedSqlException;
+import io.github.spharris.stash.service.db.exceptions.UniquenessConstraintException;
 import io.github.spharris.stash.service.request.CreateEnvironmentRequest;
 import io.github.spharris.stash.service.request.CreateProjectRequest;
 import io.github.spharris.stash.service.request.DeleteEnvironmentRequest;
@@ -70,7 +72,7 @@ public class EnvironmentDaoImplTest extends BaseDaoTest {
       .setEnvironment(TestEntities.TEST_ENVIRONMENT)
       .build());
     
-    thrown.expect(RuntimeException.class);
+    thrown.expect(UniquenessConstraintException.class);
     
     environmentDao.createEnvironment(CreateEnvironmentRequest.builder()
       .setProjectId(TestEntities.TEST_PROJECT_ID)
@@ -80,7 +82,7 @@ public class EnvironmentDaoImplTest extends BaseDaoTest {
 
   @Test
   public void errorOnNonExistantProject() throws Exception {
-    thrown.expect(RuntimeException.class);
+    thrown.expect(IllegalStateException.class);
 
     environmentDao.createEnvironment(CreateEnvironmentRequest.builder()
       .setProjectId("another-project")
@@ -204,7 +206,7 @@ public class EnvironmentDaoImplTest extends BaseDaoTest {
   
   @Test
   public void errorWithoutPolicyArn() throws Exception {
-    thrown.expect(RuntimeException.class);
+    thrown.expect(UnexpectedSqlException.class);
     
     environmentDao.createEnvironment(CreateEnvironmentRequest.builder()
       .setProjectId(TestEntities.TEST_PROJECT_ID)
