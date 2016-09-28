@@ -12,6 +12,8 @@ public class StashDatabaseModule extends AbstractModule {
     bind(Key.get(String.class, DatabaseFile.class)).toInstance("stash-db.sqlite");
     
     bind(DatabaseService.class).to(DatabaseServiceImpl.class);
+    bind(ProjectDao.class).to(ProjectDaoImpl.class);
     bind(EnvironmentDao.class).to(EnvironmentDaoImpl.class);
+    bind(SecretDao.class).to(SecretDaoImpl.class);
   }
 }

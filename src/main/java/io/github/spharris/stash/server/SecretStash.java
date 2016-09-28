@@ -37,6 +37,8 @@ public final class SecretStash {
     handler.addServlet(sh, "/*");
     server.setHandler(handler);
 
+    injector.getInstance(DatabaseService.class).start();
+    
     server.start();
     server.join();
   }
