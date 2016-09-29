@@ -5,16 +5,16 @@ import com.google.auto.value.AutoValue;
 import io.github.spharris.stash.Environment;
 
 @AutoValue
-public abstract class UpdatePolicyRequest {
+public abstract class CreateEnvironmentPolicyRequest {
 
-  UpdatePolicyRequest() {}
+  CreateEnvironmentPolicyRequest() {}
   
   public abstract String getProjectId();
   public abstract Environment getEnvironment();
   
   public abstract Builder toBuilder();
   public static Builder builder() {
-    return new AutoValue_UpdatePolicyRequest.Builder();
+    return new AutoValue_CreateEnvironmentPolicyRequest.Builder();
   }
   
   @AutoValue.Builder
@@ -23,6 +23,6 @@ public abstract class UpdatePolicyRequest {
     public abstract Builder setProjectId(String projectId);
     public abstract Builder setEnvironment(Environment environment);
     
-    public abstract UpdatePolicyRequest build();
+    public abstract CreateEnvironmentPolicyRequest build();
   }
 }

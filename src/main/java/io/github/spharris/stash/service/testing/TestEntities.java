@@ -4,6 +4,7 @@ import io.github.spharris.stash.AccessControlList;
 import io.github.spharris.stash.Environment;
 import io.github.spharris.stash.Project;
 import io.github.spharris.stash.Secret;
+import io.github.spharris.stash.service.aws.Policy;
 
 /**
  * Entities used in test cases
@@ -35,6 +36,10 @@ public class TestEntities {
   public static final String TEST_POLICY_ARN = "test-policy-arn";
   public static final String TEST_POLICY_ACCOUNT = "12345";
   
+  public static final Policy TEST_POLICY = Policy.builder()
+      .setArn(TEST_POLICY_ARN)
+      .build();
+  
   /*
    * Environment-related entities
    */
@@ -49,7 +54,18 @@ public class TestEntities {
       .setRoles(TEST_ROLE)
       .build();
   
+  public static final AccessControlList TEST_ACL_NO_ARN = AccessControlList.builder()
+      .setGroups(TEST_GROUP)
+      .setRoles(TEST_ROLE)
+      .build();
+  
   public static final Environment TEST_ENVIRONMENT = Environment.builder()
+      .setEnvironmentId(TEST_ENVIRONMENT_ID)
+      .setDescription(TEST_ENVIRONMENT_DESCRIPTION)
+      .setAcl(TEST_ACL)
+      .build();
+  
+  public static final Environment TEST_ENVIRONMENT_NO_ARN = Environment.builder()
       .setEnvironmentId(TEST_ENVIRONMENT_ID)
       .setDescription(TEST_ENVIRONMENT_DESCRIPTION)
       .setAcl(TEST_ACL)

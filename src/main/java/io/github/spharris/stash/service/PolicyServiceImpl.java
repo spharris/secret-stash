@@ -11,7 +11,6 @@ import com.amazonaws.services.identitymanagement.model.AttachGroupPolicyRequest;
 import com.amazonaws.services.identitymanagement.model.AttachRolePolicyRequest;
 import com.amazonaws.services.identitymanagement.model.CreatePolicyRequest;
 import com.amazonaws.services.identitymanagement.model.CreatePolicyResult;
-import com.amazonaws.services.identitymanagement.model.DeletePolicyRequest;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 
@@ -20,7 +19,8 @@ import io.github.spharris.stash.service.Annotations.PolicyPath;
 import io.github.spharris.stash.service.Annotations.PolicyPrefix;
 import io.github.spharris.stash.service.aws.Policy;
 import io.github.spharris.stash.service.aws.Statement;
-import io.github.spharris.stash.service.request.UpdatePolicyRequest;
+import io.github.spharris.stash.service.request.DeleteEnvironmentPolicyRequest;
+import io.github.spharris.stash.service.request.CreateEnvironmentPolicyRequest;
 import io.github.spharris.stash.service.utils.JsonUtil;
 import io.github.spharris.stash.service.utils.ObjectNameUtil;
 
@@ -45,7 +45,7 @@ public class PolicyServiceImpl implements PolicyService {
   }
 
   @Override
-  public Policy updateEnvironmentPolicy(UpdatePolicyRequest request) {
+  public Policy createEnvironmentPolicy(CreateEnvironmentPolicyRequest request) {
     Policy policy = createPolicy(request.getProjectId(),
       request.getEnvironment().getEnvironmentId());
     
@@ -73,7 +73,7 @@ public class PolicyServiceImpl implements PolicyService {
   }
 
   @Override
-  public synchronized void deleteEnvironmentPolicy(DeletePolicyRequest request) {
+  public synchronized void deleteEnvironmentPolicy(DeleteEnvironmentPolicyRequest request) {
     // TODO Auto-generated method stub
     
   }

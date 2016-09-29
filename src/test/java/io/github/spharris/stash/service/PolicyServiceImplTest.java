@@ -24,7 +24,7 @@ import com.google.inject.Guice;
 
 import io.github.spharris.stash.service.aws.Policy;
 import io.github.spharris.stash.service.aws.Statement;
-import io.github.spharris.stash.service.request.UpdatePolicyRequest;
+import io.github.spharris.stash.service.request.CreateEnvironmentPolicyRequest;
 import io.github.spharris.stash.service.testing.FakeIamClient;
 import io.github.spharris.stash.service.testing.TestEntities;
 import io.github.spharris.stash.service.testing.TestServiceModule;
@@ -45,7 +45,7 @@ public class PolicyServiceImplTest {
   
   @Test
   public void createsPolicyIfNonExistant() {
-    Policy policy = policyService.updateEnvironmentPolicy(UpdatePolicyRequest.builder()
+    Policy policy = policyService.createEnvironmentPolicy(CreateEnvironmentPolicyRequest.builder()
       .setProjectId(TestEntities.TEST_PROJECT_ID)
       .setEnvironment(TestEntities.TEST_ENVIRONMENT)
       .build());
@@ -72,7 +72,7 @@ public class PolicyServiceImplTest {
   
   @Test
   public void attachesPolicy() {
-    Policy policy = policyService.updateEnvironmentPolicy(UpdatePolicyRequest.builder()
+    Policy policy = policyService.createEnvironmentPolicy(CreateEnvironmentPolicyRequest.builder()
       .setProjectId(TestEntities.TEST_PROJECT_ID)
       .setEnvironment(TestEntities.TEST_ENVIRONMENT)
       .build());

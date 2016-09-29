@@ -1,9 +1,8 @@
 package io.github.spharris.stash.service;
 
-import com.amazonaws.services.identitymanagement.model.DeletePolicyRequest;
-
 import io.github.spharris.stash.service.aws.Policy;
-import io.github.spharris.stash.service.request.UpdatePolicyRequest;
+import io.github.spharris.stash.service.request.DeleteEnvironmentPolicyRequest;
+import io.github.spharris.stash.service.request.CreateEnvironmentPolicyRequest;
 
 public interface PolicyService {
   
@@ -13,6 +12,6 @@ public interface PolicyService {
    */
   public static final String POLICY_ID = "stash-generated-policy";
   
-  Policy updateEnvironmentPolicy(UpdatePolicyRequest request);
-  void deleteEnvironmentPolicy(DeletePolicyRequest request); 
+  Policy createEnvironmentPolicy(CreateEnvironmentPolicyRequest request);
+  void deleteEnvironmentPolicy(DeleteEnvironmentPolicyRequest request); 
 }

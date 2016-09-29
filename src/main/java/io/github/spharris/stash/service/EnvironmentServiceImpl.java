@@ -1,64 +1,67 @@
 package io.github.spharris.stash.service;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 
-import com.amazonaws.services.s3.AmazonS3;
 import com.google.common.collect.ImmutableList;
 
 import io.github.spharris.stash.Environment;
-import io.github.spharris.stash.service.Annotations.BucketOfSecrets;
+import io.github.spharris.stash.Secret;
+import io.github.spharris.stash.service.aws.Policy;
+import io.github.spharris.stash.service.db.EnvironmentDao;
+import io.github.spharris.stash.service.request.CreateEnvironmentPolicyRequest;
 import io.github.spharris.stash.service.request.CreateEnvironmentRequest;
+import io.github.spharris.stash.service.request.DeleteEnvironmentPolicyRequest;
 import io.github.spharris.stash.service.request.DeleteEnvironmentRequest;
+import io.github.spharris.stash.service.request.DeleteSecretRequest;
 import io.github.spharris.stash.service.request.GetEnvironmentRequest;
 import io.github.spharris.stash.service.request.ListEnvironmentsRequest;
+import io.github.spharris.stash.service.request.ListSecretsRequest;
 import io.github.spharris.stash.service.request.UpdateEnvironmentRequest;
-import io.github.spharris.stash.service.request.UpdatePolicyRequest;
-import io.github.spharris.stash.service.utils.JsonUtil;
-import io.github.spharris.stash.service.utils.ObjectNameUtil;
 
 public class EnvironmentServiceImpl implements EnvironmentService {
 
-  private final String bucketName;
-  private final AmazonS3 s3client;
-  private final JsonUtil json;
+  private final EnvironmentDao environmentDao;
+  private final SecretService secretService;
   private final PolicyService policyService;
   
   @Inject
-  EnvironmentServiceImpl(@BucketOfSecrets String bucketName, AmazonS3 s3client, JsonUtil json,
-      PolicyService policyService) {
-    this.bucketName = bucketName;
-    this.s3client = s3client;
-    this.json = json;
+  EnvironmentServiceImpl(EnvironmentDao environmentDao, PolicyService policyService,
+    SecretService secretService) {
+    this.environmentDao = environmentDao;
     this.policyService = policyService;
+    this.secretService = secretService;
   }
   
   @Override
   public ImmutableList<Environment> listEnvironments(ListEnvironmentsRequest request) {
-    // TODO Auto-generated method stub
-    return null;
+    return environmentDao.listEnvironments(request);
   }
  
   @Override
   public Environment createEnvironment(CreateEnvironmentRequest request) {
-    // TODO(spharris): What to do if the project doesn't exist already?
     Environment environment = request.getEnvironment();
     
-    s3client.putObject(bucketName, ObjectNameUtil.createS3Path(
-      request.getProjectId(), environment.getEnvironmentId()),
-      json.toString(environment));
-    
-    policyService.updateEnvironmentPolicy(UpdatePolicyRequest.builder()
+    Policy policy = policyService.createEnvironmentPolicy(CreateEnvironmentPolicyRequest.builder()
       .setProjectId(request.getProjectId())
       .setEnvironment(request.getEnvironment())
       .build());
     
-    return environment;
+    environment = environment.toBuilder()
+        .setAcl(environment.getAcl().toBuilder()
+          .setPolicyArn(policy.getArn())
+          .build())
+        .build();
+    
+    return environmentDao.createEnvironment(request.toBuilder()
+      .setEnvironment(environment)
+      .build());
   }
 
   @Override
-  public Environment getEnvironment(GetEnvironmentRequest request) {
-    // TODO Auto-generated method stub
-    return null;
+  public Optional<Environment> getEnvironment(GetEnvironmentRequest request) {
+    return environmentDao.getEnvironment(request);
   }
 
   @Override
@@ -69,7 +72,33 @@ public class EnvironmentServiceImpl implements EnvironmentService {
 
   @Override
   public void deleteEnvironment(DeleteEnvironmentRequest request) {
-    // TODO Auto-generated method stub
-
+    Optional<Environment> environment = getEnvironment(GetEnvironmentRequest.builder()
+      .setProjectId(request.getProjectId())
+      .setEnvironmentId(request.getEnvironmentId())
+      .build());
+    
+    if (!environment.isPresent()) {
+      return;
+    }
+    
+    ImmutableList<Secret> secrets = secretService.listSecrets(ListSecretsRequest.builder()
+      .setProjectId(request.getProjectId())
+      .setEnvironmentId(request.getEnvironmentId())
+      .build());
+    
+    // Clean up secrets individually so that the S3 files get deleted
+    for (Secret s : secrets) {
+      secretService.deleteSecret(DeleteSecretRequest.builder()
+        .setProjectId(request.getProjectId())
+        .setEnvironmentId(request.getEnvironmentId())
+        .setSecretId(s.getSecretId())
+        .build());
+    }
+    
+    policyService.deleteEnvironmentPolicy(DeleteEnvironmentPolicyRequest.builder()
+      .setEnvironment(environment.get())
+      .build());
+    
+    environmentDao.deleteEnvironment(request);
   }
 }
