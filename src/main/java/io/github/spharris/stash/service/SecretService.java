@@ -1,5 +1,7 @@
 package io.github.spharris.stash.service;
 
+import java.util.Optional;
+
 import com.google.common.collect.ImmutableList;
 
 import io.github.spharris.stash.Secret;
@@ -13,7 +15,7 @@ public interface SecretService {
 
   ImmutableList<Secret> listSecrets(ListSecretsRequest request);
   Secret createSecret(CreateSecretRequest request);
-  Secret getSecret(GetSecretRequest request);
+  Optional<Secret> getSecret(GetSecretRequest request);
   Secret updateSecret(UpdateSecretRequest request);
   void deleteSecret(DeleteSecretRequest request);
 }

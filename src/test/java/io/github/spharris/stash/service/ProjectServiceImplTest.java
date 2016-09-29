@@ -35,7 +35,7 @@ public class ProjectServiceImplTest {
   ProjectService projectService;
   
   @Before
-  public void createInjector() {
+  public void initializeService() {
     projectService = new ProjectServiceImpl(projectDao, environmentService);
   }
   

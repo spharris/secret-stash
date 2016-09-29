@@ -24,7 +24,6 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.AmazonWebServiceRequest;
 import com.amazonaws.HttpMethod;
-import com.amazonaws.auth.policy.Policy;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.S3ClientOptions;
 import com.amazonaws.services.s3.S3ResponseMetadata;
@@ -277,9 +276,9 @@ public class FakeS3Client implements AmazonS3 {
   }
 
   @Override
-  public void deleteObject(String arg0, String arg1)
+  public void deleteObject(String bucket, String key)
       throws AmazonClientException, AmazonServiceException {
-    throw new UnsupportedOperationException();
+    data.remove(makePath(bucket, key));
   }
 
   @Override

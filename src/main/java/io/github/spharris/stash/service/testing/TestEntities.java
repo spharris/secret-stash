@@ -83,4 +83,9 @@ public class TestEntities {
       .setDescription(TEST_SECRET_DESCRIPTION)
       .setSecretValue(TEST_SECRET_VALUE)
       .build();
+  
+  public static final Secret TEST_SECRET_NO_VALUE = Secret.builder()
+      .setSecretId(TEST_SECRET_ID)
+      .setDescription(TEST_SECRET_DESCRIPTION)
+      .build();
 }

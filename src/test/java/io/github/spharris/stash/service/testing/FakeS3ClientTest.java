@@ -42,9 +42,17 @@ public class FakeS3ClientTest {
     client.putObject(TEST_BUCKET, TEST_FILE, TEST_DATA);
     
     String result = CharStreams.toString(new InputStreamReader(
-      client.getObject(TEST_BUCKET, TEST_FILE).getObjectContent()));
+      client.getObject(TEST_BUCKET, TEST_FILE).getObjectContent(), StandardCharsets.UTF_8));
     
     assertThat(result).isEqualTo(TEST_DATA);
+  }
+  
+  @Test
+  public void deletesObject() throws Exception {
+    client.putObject(TEST_BUCKET, TEST_FILE, TEST_DATA);
+    client.deleteObject(TEST_BUCKET, TEST_FILE);
+    
+    assertThat(client.getObject(TEST_BUCKET, TEST_FILE)).isNull();
   }
   
   @Test
@@ -185,6 +193,4 @@ public class FakeS3ClientTest {
       client.putObject(TEST_BUCKET, prefix + String.valueOf(i), String.valueOf(i));
     }
   }
-  
-  
 }

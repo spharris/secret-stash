@@ -38,7 +38,7 @@ public class EnvironmentServiceImplTest {
   EnvironmentService environmentService;
   
   @Before
-  public void createInjector() {
+  public void initializeService() {
     environmentService = new EnvironmentServiceImpl(environmentDao, policyService, secretService);
   }
   
