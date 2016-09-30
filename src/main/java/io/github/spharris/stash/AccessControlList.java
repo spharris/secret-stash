@@ -2,6 +2,7 @@ package io.github.spharris.stash;
 
 import javax.annotation.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
@@ -27,10 +28,10 @@ public abstract class AccessControlList {
   @JsonPOJOBuilder(buildMethodName = "build", withPrefix = "set")
   public abstract static class Builder {
 
-    public abstract Builder setPolicyArn(String policyArn);
     public abstract Builder setRoles(String... roles);
     public abstract Builder setGroups(String... groups);
-  
+
+    @JsonIgnore public abstract Builder setPolicyArn(String policyArn);
     @JsonProperty("roles") public abstract Builder setRoles(Iterable<String> roles);
     @JsonProperty("groups") public abstract Builder setGroups(Iterable<String> groups);
     
