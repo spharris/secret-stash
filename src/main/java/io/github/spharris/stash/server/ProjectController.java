@@ -1,9 +1,12 @@
 package io.github.spharris.stash.server;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -15,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import io.github.spharris.stash.Project;
 import io.github.spharris.stash.service.ProjectService;
 import io.github.spharris.stash.service.request.CreateProjectRequest;
+import io.github.spharris.stash.service.request.GetProjectRequest;
 import io.github.spharris.stash.service.request.ListProjectsRequest;
 
 @Path("/")
@@ -51,7 +55,17 @@ public final class ProjectController {
   @Path("/projects/{projectId}")
   public Response<Project> getProject(
       @PathParam("projectId") String projectId) {
-    return Response.<Project>builder().build();
+    Optional<Project> project = projectService.getProject(GetProjectRequest.builder()
+          .setProjectId(projectId)
+          .build());
+    
+    if (!project.isPresent()) {
+      throw new NotFoundException();
+    } else {
+      return Response.<Project>builder()
+        .setValue(project.get())
+        .build();
+    }
   }
   
   @PUT

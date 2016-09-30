@@ -1,9 +1,12 @@
 package io.github.spharris.stash.server;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -15,6 +18,8 @@ import com.google.common.collect.ImmutableList;
 import io.github.spharris.stash.Environment;
 import io.github.spharris.stash.service.EnvironmentService;
 import io.github.spharris.stash.service.request.CreateEnvironmentRequest;
+import io.github.spharris.stash.service.request.GetEnvironmentRequest;
+import io.github.spharris.stash.service.request.ListEnvironmentsRequest;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -32,7 +37,11 @@ public final class EnvironmentController {
   @Path("/projects/{projectId}/environments")
   public Response<ImmutableList<Environment>> listEnvironments(
       @PathParam("projectId") String projectId) {
-    return Response.<ImmutableList<Environment>>builder().build();
+    return Response.<ImmutableList<Environment>>builder()
+        .setValue(environmentService.listEnvironments(ListEnvironmentsRequest.builder()
+          .setProjectId(projectId)
+          .build()))
+        .build();
   }
   
   @PUT
@@ -53,7 +62,18 @@ public final class EnvironmentController {
   public Response<Environment> getEnvironment(
       @PathParam("projectId") String projectId,
       @PathParam("environmentId") String environmentId) {
-    return Response.<Environment>builder().build();
+    Optional<Environment> environment = environmentService.getEnvironment(GetEnvironmentRequest.builder()
+          .setProjectId(projectId)
+          .setEnvironmentId(environmentId)
+          .build());
+    
+    if (!environment.isPresent()) {
+      throw new NotFoundException();
+    } else {
+      return Response.<Environment>builder()
+        .setValue(environment.get())
+        .build();
+    }
   }
   
   @PUT

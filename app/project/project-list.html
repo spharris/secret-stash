@@ -1,0 +1,17 @@
+<h1>Secret Stash</h1>
+<p class="text-right">
+	<a href="#" class="btn btn-primary glyphicon glyphicon-plus"></a>
+</p>
+<table class="table table-striped">
+	<tr>
+		<th>Project ID</th>
+		<th>Description</th>
+		<th>Options</th>
+	</tr>
+	<tr ng-repeat="project in projects">
+		<td><a href="/#!/projects/{{project.projectId}}">{{project.projectId}}</a></td>
+		<td>{{project.description}}</td>
+		<td><a href="#" class="glyphicon glyphicon-pencil"></a> <a
+			href="#" class="glyphicon glyphicon-remove"></a></td>
+	</tr>
+</table>

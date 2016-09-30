@@ -1,0 +1,22 @@
+<h1>{{project.projectId}}</h1>
+<p>{{project.description}}</p>
+<p class="text-right">
+	<a href="#" class="btn btn-primary glyphicon glyphicon-plus"></a>
+</p>
+<table class="table table-striped">
+	<tr>
+		<th>Environment ID</th>
+		<th>Description</th>
+		<th>Roles</th>
+		<th>Groups</th>
+		<th>Options</th>
+	</tr>
+	<tr ng-repeat="environment in environments">
+		<td><a href="/#!/projects/{{project.projectId}}/environments/{{environment.environmentId}}">{{environment.environmentId}}</a></td>
+		<td>{{environment.description}}</td>
+		<td>{{environment.acl.roles.join(', ')}}</td>
+		<td>{{environment.acl.groups.join(', ')}}</td>
+		<td><a href="#" class="glyphicon glyphicon-pencil"></a> <a
+			href="#" class="glyphicon glyphicon-remove"></a></td>
+	</tr>
+</table>

@@ -1,7 +1,13 @@
-var app = angular.module('secretStash', [])
+angular
+	.module('secretStash', ['ngRoute', 'stashApi'])
+	.config(['$locationProvider', '$routeProvider', function($locationProvider, $routeProvider) {
+	  $locationProvider.hashPrefix('!');
 
-app.controller('ProjectListController', function($scope, $http) {
-	$http.get('api/projects').then(function(response) {
-		$scope.projects = response.data.value;
-	});
-});
+		$routeProvider
+			.when('/', {
+				template: '<project-list></project-list>'
+			})
+			.when('/projects/:projectId', {
+				template: '<environment-list></environment-list>'
+			});
+	}]);
