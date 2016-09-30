@@ -1,6 +1,8 @@
 package io.github.spharris.stash.server;
 
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.jboss.resteasy.plugins.guice.GuiceResteasyBootstrapServletContextListener;
@@ -27,7 +29,19 @@ public final class SecretStash {
 
   public static void main(String[] args) throws Exception {
     Server server = new Server(3000);
-    ServletContextHandler handler = new ServletContextHandler(server, "/");
+    
+    HandlerCollection collection = new HandlerCollection();
+    collection.addHandler(createApi(server));
+    collection.addHandler(createSite(server));
+    
+    server.setHandler(collection);
+    
+    server.start();
+    server.join();
+  }
+  
+  private static ServletContextHandler createApi(Server server) throws Exception {
+    ServletContextHandler handler = new ServletContextHandler(server, "/api");
     
     Injector injector = Guice.createInjector(getModules());
     handler.addEventListener(injector.getInstance(
@@ -35,12 +49,18 @@ public final class SecretStash {
 
     ServletHolder sh = new ServletHolder(HttpServletDispatcher.class);
     handler.addServlet(sh, "/*");
-    server.setHandler(handler);
 
     injector.getInstance(DatabaseService.class).start();
     
-    server.start();
-    server.join();
+    return handler;
+  }
+  
+  private static ServletContextHandler createSite(Server server) {
+    ServletContextHandler handler = new ServletContextHandler(server, "/");
+    handler.setResourceBase("site/");
+    handler.addServlet(DefaultServlet.class, "/*");
+    
+    return handler;
   }
   
   private static ImmutableList<Module> getModules() {
