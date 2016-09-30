@@ -8,6 +8,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -118,6 +119,7 @@ import com.amazonaws.services.s3.model.UploadPartResult;
 import com.amazonaws.services.s3.model.VersionListing;
 import com.amazonaws.services.s3.waiters.AmazonS3Waiters;
 import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
 
 /**
  * Fake S3 client used for testing. Implements a VERY limited subset of S3 functionality
@@ -528,9 +530,16 @@ public class FakeS3Client implements AmazonS3 {
   }
 
   @Override
-  public String getObjectAsString(String arg0, String arg1)
+  public String getObjectAsString(String bucketName, String key)
       throws AmazonServiceException, AmazonClientException {
-    throw new UnsupportedOperationException();
+    S3Object object = data.get(makePath(bucketName, key));
+    
+    try {
+      return CharStreams.toString(
+        new InputStreamReader(object.getObjectContent(), StandardCharsets.UTF_8));
+    } catch (IOException e) {
+      throw new AmazonServiceException(e.getMessage());
+    }
   }
 
   @Override

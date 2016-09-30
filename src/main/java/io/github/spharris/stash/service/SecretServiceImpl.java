@@ -1,8 +1,6 @@
 package io.github.spharris.stash.service;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
@@ -10,9 +8,7 @@ import javax.inject.Inject;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.google.common.collect.ImmutableList;
-import com.google.common.io.CharStreams;
 
 import io.github.spharris.stash.Secret;
 import io.github.spharris.stash.service.Annotations.BucketOfSecrets;
@@ -75,30 +71,17 @@ public class SecretServiceImpl implements SecretService {
     }
     
     Secret secret = optionalSecret.get();
-    S3ObjectInputStream stream = s3client.getObject(bucketName, ObjectNameUtil.createS3Path(
+    String secretValue = s3client.getObjectAsString(bucketName, ObjectNameUtil.createS3Path(
           request.getProjectId(),
           request.getEnvironmentId(),
-          request.getSecretId()))
-        .getObjectContent();
+          request.getSecretId()));
     
-    try {
-      String secretValue = CharStreams.toString(
-        new InputStreamReader(stream, StandardCharsets.UTF_8));
-      if (secretValue.length() == 0) {
-        return Optional.of(secret);
-      } else {
-        return Optional.of(secret.toBuilder()
-          .setSecretValue(secretValue)
-          .build());
-      }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    } finally {
-      try {
-        stream.close();
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
+    if (secretValue.length() == 0) {
+      return Optional.of(secret);
+    } else {
+      return Optional.of(secret.toBuilder()
+        .setSecretValue(secretValue)
+        .build());
     }
   }
 

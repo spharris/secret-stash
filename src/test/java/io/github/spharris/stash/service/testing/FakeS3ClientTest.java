@@ -48,6 +48,15 @@ public class FakeS3ClientTest {
   }
   
   @Test
+  public void getsObjectAsString() throws Exception {
+    client.putObject(TEST_BUCKET, TEST_FILE, TEST_DATA);
+    
+    String result = client.getObjectAsString(TEST_BUCKET, TEST_FILE);
+    
+    assertThat(result).isEqualTo(TEST_DATA);
+  }
+  
+  @Test
   public void deletesObject() throws Exception {
     client.putObject(TEST_BUCKET, TEST_FILE, TEST_DATA);
     client.deleteObject(TEST_BUCKET, TEST_FILE);
