@@ -57,7 +57,7 @@ public final class SecretStash {
   
   private static ServletContextHandler createSite(Server server) {
     ServletContextHandler handler = new ServletContextHandler(server, "/");
-    handler.setResourceBase("site/");
+    handler.setResourceBase("app/");
     handler.addServlet(DefaultServlet.class, "/*");
     
     return handler;

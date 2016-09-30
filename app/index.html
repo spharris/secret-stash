@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" ng-app="secretStash">
+  <head>
+    <meta charset="utf-8">
+    <title>My HTML File</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+    	crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+    	
+    <script src="app.js"></script>
+  </head>
+  <body>
+  	<div class="container" ng-controller="ProjectListController">
+  		<div class="row">
+  			<div class="col-lg-8 col-lg-offset-2">
+  				<h1>Secret Stash</h1>
+  				<p class="text-right">
+  					<a href="#" class="btn btn-primary glyphicon glyphicon-plus"></a>
+  				</p>
+  				<table class="table table-striped">
+  					<tr>
+  						<th>Project ID</th>
+  						<th>Description</th>
+  						<th>Options</th>
+  					</tr>
+  					<tr ng-repeat="project in projects">
+  						<td>{{project.projectId}}</td>
+  						<td>{{project.description}}</td>
+  						<td>
+  							<a href="#" class="glyphicon glyphicon-pencil"></a>
+  							<a href="#" class="glyphicon glyphicon-remove"></a>
+  						</td>
+  					</tr>
+  				</table>
+  			</div>
+  		</div>
+  	</div>
+  </body>
+</html>
