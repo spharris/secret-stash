@@ -13,6 +13,10 @@ angular
           api.getObject($routeParams.projectId, $routeParams.environmentId).then(function(result) {
             $scope.environment = result.data.value;
           });
+          
+          api.getObject($routeParams.projectId).then(function(result) {
+            $scope.project = result.data.value;
+          });
 
           self.updateSecretList();
         }
