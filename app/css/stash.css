@@ -21,3 +21,7 @@
 .environment-permissions {
 	width: 20%;
 }
+
+textarea.form-description {
+	height: 100px;
+}

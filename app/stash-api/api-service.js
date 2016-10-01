@@ -7,6 +7,13 @@ angular
 		}
 
 		/**
+		 * Create a new object in the Secret Stash API
+		 */
+		ApiService.putObject = function(data, projectId, environmentId) {
+			return this.http.put(this.createListUrl(projectId, environmentId), data);
+		};
+		
+		/**
 		 * Return a single object from the Secret Stash API
 		 */
 		ApiService.getObject = function(projectId, environmentId, secretId, params) {
@@ -15,10 +22,10 @@ angular
 		};
 		
 		/**
-		 * Create a new object in the Secret Stash API
+		 * Delete a single object from the Secret Stash API
 		 */
-		ApiService.putObject = function(data, projectId, environmentId) {
-			return this.http.put(this.createListUrl(projectId, environmentId), data);
+		ApiService.deleteObject = function(projectId, environmentId, secretId) {
+			return this.http.delete(this.createObjectUrl(projectId, environmentId, secretId));
 		};
 		
 		/**
