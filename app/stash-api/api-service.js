@@ -9,8 +9,9 @@ angular
 		/**
 		 * Return a single object from the Secret Stash API
 		 */
-		ApiService.getObject = function(projectId, environmentId, secretId) {
-			return this.http.get(this.createObjectUrl(projectId, environmentId, secretId));
+		ApiService.getObject = function(projectId, environmentId, secretId, params) {
+			return this.http.get(this.createObjectUrl(projectId, environmentId, secretId),
+			    {params: params});
 		};
 		
 		/**
@@ -28,40 +29,33 @@ angular
 		};
 
 		ApiService.createObjectUrl = function(projectId, environmentId, secretId) {
-		  projectId = projectId || null;
-		  environmentId = environmentId || null;
-		  secretId = secretId || null;
-
 		  var url = this.apiBase + '/projects/';
 		  
-		  if (projectId != null) {
+		  if (projectId) {
 		    url = url + projectId;
 		  } else {
 		    throw 'projectId is required';
 		  }
 		  
-		  if (environmentId != null) {
+		  if (environmentId) {
 		    url = url + '/environments/' + environmentId;
 		  }
 		  
-		  if (secretId != null) {
-		    url = url + '/secrets/' + environmentId;
+		  if (secretId) {
+		    url = url + '/secrets/' + secretId;
 		  }
 		  
 		  return url;
 		}
 		
 		ApiService.createListUrl = function(projectId, environmentId) {
-		  projectId = projectId || null;
-		  environmentId = environmentId || null;
-
 		  var url = this.apiBase + '/projects';
 		  
-		  if (projectId != null) {
+		  if (projectId) {
 		    url = url + '/' + projectId + '/environments';
 		  }
 		  
-		  if (environmentId != null) {
+		  if (environmentId) {
 		    url = url + '/' + environmentId + '/secrets'
 		  }
 		  

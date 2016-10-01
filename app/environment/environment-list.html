@@ -5,18 +5,20 @@
 </p>
 <table class="table table-striped">
 	<tr>
-		<th>Environment ID</th>
-		<th>Description</th>
-		<th>Roles</th>
-		<th>Groups</th>
-		<th>Options</th>
+		<th class="object-id">Environment ID</th>
+		<th class="object-description">Description</th>
+		<th class="environment-permissions">Roles</th>
+		<th class="environment-permissions">Groups</th>
+		<th class="object-options">Options</th>
 	</tr>
 	<tr ng-repeat="environment in environments">
 		<td><a href="/#!/projects/{{project.projectId}}/environments/{{environment.environmentId}}">{{environment.environmentId}}</a></td>
 		<td>{{environment.description}}</td>
 		<td>{{environment.acl.roles.join(', ')}}</td>
 		<td>{{environment.acl.groups.join(', ')}}</td>
-		<td><a href="#" class="glyphicon glyphicon-pencil"></a> <a
-			href="#" class="glyphicon glyphicon-remove"></a></td>
+		<td>
+			<span class="stash-link glyphicon glyphicon-pencil" title="Edit"></span>
+			<span class="stash-link glyphicon glyphicon-remove" title="Delete"></span>
+		</td>
 	</tr>
 </table>

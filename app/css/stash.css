@@ -1,0 +1,23 @@
+.stash-link {
+	cursor: pointer;
+}
+
+.object-id {
+	width: 15%;	
+}
+
+.object-description {
+	
+}
+
+.object-value {
+	width: 20%;
+}
+
+.object-options {
+	width: 5%;
+}
+
+.environment-permissions {
+	width: 20%;
+}

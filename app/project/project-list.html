@@ -4,14 +4,16 @@
 </p>
 <table class="table table-striped">
 	<tr>
-		<th>Project ID</th>
-		<th>Description</th>
-		<th>Options</th>
+		<th class="object-id">Project ID</th>
+		<th class="object-description">Description</th>
+		<th class="object-options">Options</th>
 	</tr>
 	<tr ng-repeat="project in projects">
 		<td><a href="/#!/projects/{{project.projectId}}">{{project.projectId}}</a></td>
 		<td>{{project.description}}</td>
-		<td><a href="#" class="glyphicon glyphicon-pencil"></a> <a
-			href="#" class="glyphicon glyphicon-remove"></a></td>
+		<td>
+			<span class="stash-link glyphicon glyphicon-pencil" title="Edit"></span>
+			<span class="stash-link glyphicon glyphicon-remove" title="Delete"></span>
+		</td>
 	</tr>
 </table>

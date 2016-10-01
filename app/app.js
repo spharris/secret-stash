@@ -9,5 +9,8 @@ angular
 			})
 			.when('/projects/:projectId', {
 				template: '<environment-list></environment-list>'
+			})
+			.when('/projects/:projectId/environments/:environmentId', {
+				template: '<secret-list></secret-list>'
 			});
 	}]);
