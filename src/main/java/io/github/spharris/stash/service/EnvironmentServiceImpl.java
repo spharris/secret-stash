@@ -96,6 +96,7 @@ public class EnvironmentServiceImpl implements EnvironmentService {
     }
     
     policyService.deleteEnvironmentPolicy(DeleteEnvironmentPolicyRequest.builder()
+      .setProjectId(request.getProjectId())
       .setEnvironment(environment.get())
       .build());
     

@@ -22,10 +22,13 @@ import com.amazonaws.services.identitymanagement.model.ListAttachedRolePoliciesR
 import com.google.common.base.Joiner;
 import com.google.inject.Guice;
 
+import io.github.spharris.stash.Environment;
 import io.github.spharris.stash.service.aws.Policy;
 import io.github.spharris.stash.service.aws.Statement;
 import io.github.spharris.stash.service.request.CreateEnvironmentPolicyRequest;
+import io.github.spharris.stash.service.request.DeleteEnvironmentPolicyRequest;
 import io.github.spharris.stash.service.testing.FakeIamClient;
+import io.github.spharris.stash.service.testing.TestDatabaseModule;
 import io.github.spharris.stash.service.testing.TestEntities;
 import io.github.spharris.stash.service.testing.TestServiceModule;
 import io.github.spharris.stash.service.utils.JsonUtil;
@@ -40,7 +43,9 @@ public class PolicyServiceImplTest {
   
   @Before 
   public void createInjector() {
-    Guice.createInjector(new TestServiceModule()).injectMembers(this);
+    Guice.createInjector(
+      new TestDatabaseModule(),
+      new TestServiceModule()).injectMembers(this);
   }
   
   @Test
@@ -91,6 +96,40 @@ public class PolicyServiceImplTest {
     
     assertThat(roleResult.getAttachedPolicies()).containsExactly(expected);
     assertThat(groupResult.getAttachedPolicies()).containsExactly(expected);
+  }
+  
+  @Test
+  public void deletesPolicy() {
+    Policy policy = policyService.createEnvironmentPolicy(CreateEnvironmentPolicyRequest.builder()
+      .setProjectId(TestEntities.TEST_PROJECT_ID)
+      .setEnvironment(TestEntities.TEST_ENVIRONMENT)
+      .build());
+    
+    Environment environment = TestEntities.TEST_ENVIRONMENT.toBuilder()
+        .setAcl(TestEntities.TEST_ENVIRONMENT.getAcl().toBuilder()
+          .setPolicyArn(policy.getArn())
+          .build())
+        .build();
+    
+    policyService.deleteEnvironmentPolicy(DeleteEnvironmentPolicyRequest.builder()
+      .setProjectId(TestEntities.TEST_PROJECT_ID)
+      .setEnvironment(environment)
+      .build());
+    
+    ListAttachedRolePoliciesResult roleResult = client.listAttachedRolePolicies(
+      new ListAttachedRolePoliciesRequest()
+        .withRoleName(TestEntities.TEST_ROLE));
+    
+    ListAttachedRolePoliciesResult groupResult = client.listAttachedRolePolicies(
+      new ListAttachedRolePoliciesRequest()
+        .withRoleName(TestEntities.TEST_GROUP));
+    
+    GetPolicyResult result = client.getPolicy(new GetPolicyRequest()
+      .withPolicyArn(policy.getArn()));
+    
+    assertThat(roleResult.getAttachedPolicies()).isEmpty();
+    assertThat(groupResult.getAttachedPolicies()).isEmpty();
+    assertThat(result.getPolicy()).isNull(); 
   }
   
   private static final String getPolicyName() {

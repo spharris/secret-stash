@@ -7,6 +7,7 @@ import io.github.spharris.stash.Environment;
 @AutoValue
 public abstract class DeleteEnvironmentPolicyRequest {
 
+  public abstract String getProjectId();
   public abstract Environment getEnvironment();
   
   public abstract Builder toBuilder();
@@ -17,6 +18,7 @@ public abstract class DeleteEnvironmentPolicyRequest {
   @AutoValue.Builder
   public abstract static class Builder {
     
+    public abstract Builder setProjectId(String projectId);
     public abstract Builder setEnvironment(Environment environment);
     
     public abstract DeleteEnvironmentPolicyRequest build();

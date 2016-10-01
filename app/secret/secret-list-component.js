@@ -2,8 +2,8 @@ angular
   .module('secretStash')
   .component('secretList', {
     templateUrl: 'secret/secret-list.html',
-    controller: ['$scope', '$routeParams', 'stashApiService', 
-      function($scope, $routeParams, api) {
+    controller: ['$scope', '$routeParams', '$window', 'stashApiService', 
+      function($scope, $routeParams, $window, api) {
         var self = this;
 
         self.environment = null;
@@ -38,8 +38,10 @@ angular
         };
         
         self.deleteSecret = function(secretId) {
-          api.deleteObject($routeParams.projectId, $routeParams.environmentId, secretId)
-            .then(self.updateSecretList);
+          if ($window.confirm('Really delete ' + secretId + '?')) {
+            api.deleteObject($routeParams.projectId, $routeParams.environmentId, secretId)
+              .then(self.updateSecretList);
+          }
         }
 
         init();

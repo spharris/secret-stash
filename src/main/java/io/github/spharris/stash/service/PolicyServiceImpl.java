@@ -11,6 +11,7 @@ import com.amazonaws.services.identitymanagement.model.AttachGroupPolicyRequest;
 import com.amazonaws.services.identitymanagement.model.AttachRolePolicyRequest;
 import com.amazonaws.services.identitymanagement.model.CreatePolicyRequest;
 import com.amazonaws.services.identitymanagement.model.CreatePolicyResult;
+import com.amazonaws.services.identitymanagement.model.ListAttachedGroupPoliciesRequest;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 
@@ -73,9 +74,10 @@ public class PolicyServiceImpl implements PolicyService {
   }
 
   @Override
-  public synchronized void deleteEnvironmentPolicy(DeleteEnvironmentPolicyRequest request) {
-    // TODO Auto-generated method stub
-    
+  public void deleteEnvironmentPolicy(DeleteEnvironmentPolicyRequest request) {
+    ListAttachedGroupPoliciesRequest groupRequest = new ListAttachedGroupPoliciesRequest();
+        //.setGroupName(groupName);
+        
   }
   
   private Policy createPolicy(String projectId, String environmentId) {

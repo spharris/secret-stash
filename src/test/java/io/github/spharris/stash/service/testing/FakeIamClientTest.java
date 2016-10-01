@@ -16,12 +16,17 @@ import com.amazonaws.services.identitymanagement.model.CreatePolicyRequest;
 import com.amazonaws.services.identitymanagement.model.CreatePolicyResult;
 import com.amazonaws.services.identitymanagement.model.DetachGroupPolicyRequest;
 import com.amazonaws.services.identitymanagement.model.DetachRolePolicyRequest;
+import com.amazonaws.services.identitymanagement.model.EntityType;
 import com.amazonaws.services.identitymanagement.model.GetPolicyRequest;
 import com.amazonaws.services.identitymanagement.model.GetPolicyResult;
 import com.amazonaws.services.identitymanagement.model.ListAttachedGroupPoliciesRequest;
 import com.amazonaws.services.identitymanagement.model.ListAttachedGroupPoliciesResult;
 import com.amazonaws.services.identitymanagement.model.ListAttachedRolePoliciesRequest;
 import com.amazonaws.services.identitymanagement.model.ListAttachedRolePoliciesResult;
+import com.amazonaws.services.identitymanagement.model.ListEntitiesForPolicyRequest;
+import com.amazonaws.services.identitymanagement.model.ListEntitiesForPolicyResult;
+import com.amazonaws.services.identitymanagement.model.PolicyGroup;
+import com.amazonaws.services.identitymanagement.model.PolicyRole;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -151,6 +156,71 @@ public class FakeIamClientTest {
       new ListAttachedRolePoliciesRequest().withRoleName(TestEntities.TEST_GROUP));
     
     assertThat(result.getAttachedPolicies()).isEmpty();
+  }
+  
+  @Test
+  public void retrievesGroupAttachments() {
+    iamClient.attachRolePolicy(new AttachRolePolicyRequest()
+        .withPolicyArn(createArn(TestEntities.TEST_POLICY_NAME))
+        .withRoleName(TestEntities.TEST_ROLE));
+    
+    iamClient.attachGroupPolicy(new AttachGroupPolicyRequest()
+        .withPolicyArn(createArn(TestEntities.TEST_POLICY_NAME))
+        .withGroupName(TestEntities.TEST_GROUP));
+    
+    ListEntitiesForPolicyResult result = iamClient.listEntitiesForPolicy(new ListEntitiesForPolicyRequest()
+      .withPolicyArn(createArn(TestEntities.TEST_POLICY_NAME))
+      .withEntityFilter(EntityType.Group));
+    
+    PolicyGroup expected = new PolicyGroup()
+        .withGroupName(TestEntities.TEST_GROUP);
+    
+    assertThat(result.getPolicyRoles()).isEmpty();
+    assertThat(result.getPolicyGroups()).containsExactly(expected);
+  }
+  
+  @Test
+  public void retrievesRoleAttachments() {
+    iamClient.attachRolePolicy(new AttachRolePolicyRequest()
+        .withPolicyArn(createArn(TestEntities.TEST_POLICY_NAME))
+        .withRoleName(TestEntities.TEST_ROLE));
+    
+    iamClient.attachGroupPolicy(new AttachGroupPolicyRequest()
+        .withPolicyArn(createArn(TestEntities.TEST_POLICY_NAME))
+        .withGroupName(TestEntities.TEST_GROUP));
+    
+    ListEntitiesForPolicyResult result = iamClient.listEntitiesForPolicy(new ListEntitiesForPolicyRequest()
+      .withPolicyArn(createArn(TestEntities.TEST_POLICY_NAME))
+      .withEntityFilter(EntityType.Role));
+    
+    PolicyRole expected = new PolicyRole()
+        .withRoleName(TestEntities.TEST_ROLE);
+    
+    assertThat(result.getPolicyGroups()).isEmpty();
+    assertThat(result.getPolicyRoles()).containsExactly(expected);
+  }
+  
+  @Test
+  public void retrievesAllAttachments() {
+    iamClient.attachRolePolicy(new AttachRolePolicyRequest()
+        .withPolicyArn(createArn(TestEntities.TEST_POLICY_NAME))
+        .withRoleName(TestEntities.TEST_ROLE));
+    
+    iamClient.attachGroupPolicy(new AttachGroupPolicyRequest()
+        .withPolicyArn(createArn(TestEntities.TEST_POLICY_NAME))
+        .withGroupName(TestEntities.TEST_GROUP));
+    
+    ListEntitiesForPolicyResult result = iamClient.listEntitiesForPolicy(new ListEntitiesForPolicyRequest()
+      .withPolicyArn(createArn(TestEntities.TEST_POLICY_NAME)));
+    
+    PolicyGroup expectedGroup = new PolicyGroup()
+        .withGroupName(TestEntities.TEST_GROUP);
+    
+    PolicyRole expectedRole = new PolicyRole()
+        .withRoleName(TestEntities.TEST_ROLE);
+    
+    assertThat(result.getPolicyRoles()).containsExactly(expectedRole);
+    assertThat(result.getPolicyGroups()).containsExactly(expectedGroup);
   }
   
   private static String createArn(String policyName) {

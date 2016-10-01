@@ -2,6 +2,7 @@ package io.github.spharris.stash.service.testing;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.amazonaws.AmazonWebServiceRequest;
 import com.amazonaws.ResponseMetadata;
@@ -21,7 +22,8 @@ public class FakeIamClient implements AmazonIdentityManagement {
       + ":policy";
   
   // Maps groups/roles to attached policies
-  private final Multimap<String, String> policyAssignments = HashMultimap.create();
+  private final Multimap<String, String> groupPolicyAssignments = HashMultimap.create();
+  private final Multimap<String, String> rolePolicyAssignments = HashMultimap.create();
   private final Map<String, Policy> policies = new HashMap<>();
   
   @Override
@@ -50,14 +52,14 @@ public class FakeIamClient implements AmazonIdentityManagement {
   @Override
   public AttachGroupPolicyResult attachGroupPolicy(
       AttachGroupPolicyRequest request) {
-    policyAssignments.put(request.getGroupName(), request.getPolicyArn());
+    groupPolicyAssignments.put(request.getGroupName(), request.getPolicyArn());
     
     return new AttachGroupPolicyResult();
   }
 
   @Override
   public AttachRolePolicyResult attachRolePolicy(AttachRolePolicyRequest request) {
-    policyAssignments.put(request.getRoleName(), request.getPolicyArn());
+    rolePolicyAssignments.put(request.getRoleName(), request.getPolicyArn());
     
     return new AttachRolePolicyResult();
   }
@@ -277,14 +279,14 @@ public class FakeIamClient implements AmazonIdentityManagement {
   @Override
   public DetachGroupPolicyResult detachGroupPolicy(
       DetachGroupPolicyRequest request) {
-    policyAssignments.remove(request.getGroupName(), request.getPolicyArn());
+    groupPolicyAssignments.remove(request.getGroupName(), request.getPolicyArn());
     
     return new DetachGroupPolicyResult();
   }
 
   @Override
   public DetachRolePolicyResult detachRolePolicy(DetachRolePolicyRequest request) {
-    policyAssignments.remove(request.getRoleName(), request.getPolicyArn());
+    groupPolicyAssignments.remove(request.getRoleName(), request.getPolicyArn());
     
     return new DetachRolePolicyResult();
   }
@@ -478,7 +480,7 @@ public class FakeIamClient implements AmazonIdentityManagement {
     ListAttachedGroupPoliciesResult result = new ListAttachedGroupPoliciesResult();
     
     ImmutableList.Builder<AttachedPolicy> builder = ImmutableList.builder();
-    for (String p : policyAssignments.get(request.getGroupName())) {
+    for (String p : groupPolicyAssignments.get(request.getGroupName())) {
       builder.add(new AttachedPolicy()
         .withPolicyArn(p)
         .withPolicyName(Iterables.getLast(Splitter.on("/").splitToList(p))));
@@ -494,7 +496,7 @@ public class FakeIamClient implements AmazonIdentityManagement {
     ListAttachedRolePoliciesResult result = new ListAttachedRolePoliciesResult();
     
     ImmutableList.Builder<AttachedPolicy> builder = ImmutableList.builder();
-    for (String p : policyAssignments.get(request.getRoleName())) {
+    for (String p : rolePolicyAssignments.get(request.getRoleName())) {
       builder.add(new AttachedPolicy()
         .withPolicyArn(p)
         .withPolicyName(Iterables.getLast(Splitter.on("/").splitToList(p))));
@@ -512,10 +514,47 @@ public class FakeIamClient implements AmazonIdentityManagement {
 
   @Override
   public ListEntitiesForPolicyResult listEntitiesForPolicy(
-      ListEntitiesForPolicyRequest listEntitiesForPolicyRequest) {
-    throw new UnsupportedOperationException();
+      ListEntitiesForPolicyRequest request) {
+    ListEntitiesForPolicyResult result = new ListEntitiesForPolicyResult();
+    if (request.getEntityFilter() == null 
+        || EntityType.valueOf(request.getEntityFilter()) == EntityType.Group) {
+      ImmutableList<String> groups = findEntities(groupPolicyAssignments, request.getPolicyArn());
+      ImmutableList.Builder<PolicyGroup> policies = ImmutableList.builder();
+      for (String group : groups) {
+        policies.add(new PolicyGroup().withGroupName(group));
+      }
+      
+      result.setPolicyGroups(policies.build());
+    }
+    
+    if (request.getEntityFilter() == null 
+        || EntityType.valueOf(request.getEntityFilter()) == EntityType.Role) {
+      ImmutableList<String> roles = findEntities(rolePolicyAssignments, request.getPolicyArn());
+      ImmutableList.Builder<PolicyRole> policies = ImmutableList.builder();
+      for (String role : roles) {
+        policies.add(new PolicyRole().withRoleName(role));
+      }
+      
+      result.setPolicyRoles(policies.build());
+    }
+    
+    return result;
   }
 
+  private static ImmutableList<String> findEntities(Multimap<String, String> attachments,
+      String policyArn) {
+    ImmutableList.Builder<String> builder = ImmutableList.builder();
+    
+    // Map is entity -> policy
+    for (Entry<String, String> entry : attachments.entries()) {
+      if (entry.getValue().equals(policyArn)) {
+        builder.add(entry.getKey());
+      }
+    }
+    
+    return builder.build();
+  }
+  
   @Override
   public ListGroupPoliciesResult listGroupPolicies(
       ListGroupPoliciesRequest listGroupPoliciesRequest) {
