@@ -11,7 +11,13 @@ import com.amazonaws.services.identitymanagement.model.AttachGroupPolicyRequest;
 import com.amazonaws.services.identitymanagement.model.AttachRolePolicyRequest;
 import com.amazonaws.services.identitymanagement.model.CreatePolicyRequest;
 import com.amazonaws.services.identitymanagement.model.CreatePolicyResult;
-import com.amazonaws.services.identitymanagement.model.ListAttachedGroupPoliciesRequest;
+import com.amazonaws.services.identitymanagement.model.DeletePolicyRequest;
+import com.amazonaws.services.identitymanagement.model.DetachGroupPolicyRequest;
+import com.amazonaws.services.identitymanagement.model.DetachRolePolicyRequest;
+import com.amazonaws.services.identitymanagement.model.ListEntitiesForPolicyRequest;
+import com.amazonaws.services.identitymanagement.model.ListEntitiesForPolicyResult;
+import com.amazonaws.services.identitymanagement.model.PolicyGroup;
+import com.amazonaws.services.identitymanagement.model.PolicyRole;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 
@@ -20,8 +26,8 @@ import io.github.spharris.stash.service.Annotations.PolicyPath;
 import io.github.spharris.stash.service.Annotations.PolicyPrefix;
 import io.github.spharris.stash.service.aws.Policy;
 import io.github.spharris.stash.service.aws.Statement;
-import io.github.spharris.stash.service.request.DeleteEnvironmentPolicyRequest;
 import io.github.spharris.stash.service.request.CreateEnvironmentPolicyRequest;
+import io.github.spharris.stash.service.request.DeleteEnvironmentPolicyRequest;
 import io.github.spharris.stash.service.utils.JsonUtil;
 import io.github.spharris.stash.service.utils.ObjectNameUtil;
 
@@ -75,9 +81,27 @@ public class PolicyServiceImpl implements PolicyService {
 
   @Override
   public void deleteEnvironmentPolicy(DeleteEnvironmentPolicyRequest request) {
-    ListAttachedGroupPoliciesRequest groupRequest = new ListAttachedGroupPoliciesRequest();
-        //.setGroupName(groupName);
-        
+    // TODO(spharris): Should we just assume that the policy hasn't been managed in any way
+    // by the client?
+    String arn = request.getEnvironment().getAcl().getPolicyArn();
+    ListEntitiesForPolicyResult entities = iamClient
+        .listEntitiesForPolicy(new ListEntitiesForPolicyRequest()
+          .withPolicyArn(arn));
+
+    for (PolicyGroup pg : entities.getPolicyGroups()) {
+      iamClient.detachGroupPolicy(new DetachGroupPolicyRequest()
+        .withGroupName(pg.getGroupName())
+        .withPolicyArn(arn));
+    }
+    
+    for (PolicyRole pr : entities.getPolicyRoles()) {
+      iamClient.detachRolePolicy(new DetachRolePolicyRequest()
+        .withRoleName(pr.getRoleName())
+        .withPolicyArn(arn));
+    }
+    
+    iamClient.deletePolicy(new DeletePolicyRequest()
+      .withPolicyArn(arn));
   }
   
   private Policy createPolicy(String projectId, String environmentId) {

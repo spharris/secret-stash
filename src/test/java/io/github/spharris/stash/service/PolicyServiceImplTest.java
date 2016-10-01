@@ -17,6 +17,8 @@ import com.amazonaws.services.identitymanagement.AmazonIdentityManagement;
 import com.amazonaws.services.identitymanagement.model.AttachedPolicy;
 import com.amazonaws.services.identitymanagement.model.GetPolicyRequest;
 import com.amazonaws.services.identitymanagement.model.GetPolicyResult;
+import com.amazonaws.services.identitymanagement.model.ListAttachedGroupPoliciesRequest;
+import com.amazonaws.services.identitymanagement.model.ListAttachedGroupPoliciesResult;
 import com.amazonaws.services.identitymanagement.model.ListAttachedRolePoliciesRequest;
 import com.amazonaws.services.identitymanagement.model.ListAttachedRolePoliciesResult;
 import com.google.common.base.Joiner;
@@ -86,9 +88,9 @@ public class PolicyServiceImplTest {
       new ListAttachedRolePoliciesRequest()
         .withRoleName(TestEntities.TEST_ROLE));
     
-    ListAttachedRolePoliciesResult groupResult = client.listAttachedRolePolicies(
-      new ListAttachedRolePoliciesRequest()
-        .withRoleName(TestEntities.TEST_GROUP));
+    ListAttachedGroupPoliciesResult groupResult = client.listAttachedGroupPolicies(
+      new ListAttachedGroupPoliciesRequest()
+        .withGroupName(TestEntities.TEST_GROUP));
     
     AttachedPolicy expected = new AttachedPolicy()
       .withPolicyArn(policy.getArn())

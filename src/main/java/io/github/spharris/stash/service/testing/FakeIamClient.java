@@ -216,8 +216,10 @@ public class FakeIamClient implements AmazonIdentityManagement {
   }
 
   @Override
-  public DeletePolicyResult deletePolicy(DeletePolicyRequest deletePolicyRequest) {
-    throw new UnsupportedOperationException();
+  public DeletePolicyResult deletePolicy(DeletePolicyRequest request) {
+    policies.remove(request.getPolicyArn());
+    
+    return new DeletePolicyResult();
   }
 
   @Override
@@ -286,7 +288,7 @@ public class FakeIamClient implements AmazonIdentityManagement {
 
   @Override
   public DetachRolePolicyResult detachRolePolicy(DetachRolePolicyRequest request) {
-    groupPolicyAssignments.remove(request.getRoleName(), request.getPolicyArn());
+    rolePolicyAssignments.remove(request.getRoleName(), request.getPolicyArn());
     
     return new DetachRolePolicyResult();
   }

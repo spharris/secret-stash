@@ -14,6 +14,7 @@ import com.amazonaws.services.identitymanagement.model.AttachRolePolicyRequest;
 import com.amazonaws.services.identitymanagement.model.AttachedPolicy;
 import com.amazonaws.services.identitymanagement.model.CreatePolicyRequest;
 import com.amazonaws.services.identitymanagement.model.CreatePolicyResult;
+import com.amazonaws.services.identitymanagement.model.DeletePolicyRequest;
 import com.amazonaws.services.identitymanagement.model.DetachGroupPolicyRequest;
 import com.amazonaws.services.identitymanagement.model.DetachRolePolicyRequest;
 import com.amazonaws.services.identitymanagement.model.EntityType;
@@ -153,9 +154,30 @@ public class FakeIamClientTest {
       .withRoleName(TestEntities.TEST_ROLE));
     
     ListAttachedRolePoliciesResult result = iamClient.listAttachedRolePolicies(
-      new ListAttachedRolePoliciesRequest().withRoleName(TestEntities.TEST_GROUP));
+      new ListAttachedRolePoliciesRequest().withRoleName(TestEntities.TEST_ROLE));
     
     assertThat(result.getAttachedPolicies()).isEmpty();
+  }
+  
+  @Test
+  public void deletesPolicy() {
+    Policy p = Policy.builder()
+        .setId(TestEntities.TEST_POLICY_ID)
+        .build();
+    
+    CreatePolicyRequest request = new CreatePolicyRequest();
+    request.setPolicyName(TestEntities.TEST_POLICY_NAME);
+    request.setPolicyDocument(json.toString(p));
+    
+    CreatePolicyResult createResult = iamClient.createPolicy(request);
+    
+    iamClient.deletePolicy(new DeletePolicyRequest()
+      .withPolicyArn(createResult.getPolicy().getArn()));
+    
+    GetPolicyResult result = iamClient.getPolicy(new GetPolicyRequest()
+      .withPolicyArn(createResult.getPolicy().getArn()));
+    
+    assertThat(result.getPolicy()).isNull();
   }
   
   @Test
