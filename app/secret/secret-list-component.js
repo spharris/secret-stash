@@ -31,8 +31,6 @@ angular
                 self.secret = {}
               }
           );
-          
-          self.secretForm.$setPristine();
         };
         
         self.deleteSecret = function(secretId) {
