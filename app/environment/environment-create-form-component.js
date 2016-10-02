@@ -2,9 +2,22 @@ angular
   .module('secretStash')
   .component('environmentCreateForm', {
     templateUrl: 'environment/environment-create-form.html',
-    controller: ['$scope', '$routeParams', 'stashApiService', 
-      function($scope, $routeParams, api) {
+    controller: ['$scope', '$routeParams', '$http', 'stashApiService', 
+      function($scope, $routeParams, $http, api) {
         var self = this;
+        
+        self.roles = [];
+        self.groups = [];
+        
+        var init = function() {
+          $http.get('/api/aws/groups').then(function(result) {
+            self.groups = result.data.value;
+          });
+          
+          $http.get('/api/aws/roles').then(function(result) {
+            self.roles = result.data.value;
+          });
+        }
         
         /* Functions */
         self.createEnvironment = function() {
@@ -15,6 +28,8 @@ angular
               }
           );
         };
+        
+        init();
       }
     ],
     bindings: {

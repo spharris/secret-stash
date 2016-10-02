@@ -11,6 +11,28 @@
             <label for="environment-id" class="control-label">Environment ID</label>
             <input type="text" class="form-control" id="environment-id" ng-model="$ctrl.environment.environmentId" required>
           </div>
+          <div class="row">
+	          <div class="col-sm-6">
+		          <div class="form-group">
+		          	<label for="environment-groups" class="control-label">Allowed Groups</label>
+		          	<select multiple
+		          		class="form-control"
+		          		ng-model="$ctrl.environment.acl.groups"
+		          		ng-options="group for group in $ctrl.groups">
+		          	</select>
+		          </div>
+          	</div>
+          	<div class="col-sm-6">
+		          <div class="form-group">
+		          	<label for="environment-roles" class="control-label">Allowed Roles</label>
+		          	<select multiple
+		          		class="form-control"
+		          		ng-model="$ctrl.environment.acl.roles"
+		          		ng-options="role for role in $ctrl.roles">
+		          	</select>
+		          </div>
+          	</div>
+          </div>
           <div class="form-group">
             <label for="environment-description" class="control-label">Description</label>
             <textarea class="form-control form-description" id="environment-description" ng-model="$ctrl.environment.description"></textarea>

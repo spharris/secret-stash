@@ -1,5 +1,5 @@
 angular
-	.module('secretStash', ['ngRoute', 'stashApi'])
+	.module('secretStash', ['ngRoute', 'stashApi', 'localytics.directives'])
 	.config(['$locationProvider', '$routeProvider', function($locationProvider, $routeProvider) {
 	  $locationProvider.hashPrefix('!');
 
