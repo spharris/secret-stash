@@ -31,3 +31,14 @@
 textarea.form-description {
 	height: 100px;
 }
+
+.header-link {
+	color: black;
+	border-bottom: 1px dotted black;
+}
+
+.header-link:hover {
+	color: black;
+	text-decoration: none;
+	background: #eeeeee;
+}

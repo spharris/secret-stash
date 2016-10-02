@@ -28,15 +28,6 @@ angular
           });
         }
         
-        self.createSecret = function() {
-          api.putObject(self.secret, $routeParams.projectId, $routeParams.environmentId).then(
-              function(result) {
-                self.secrets.unshift(result.data.value);
-                self.secret = {}
-              }
-          );
-        };
-        
         self.deleteSecret = function(secretId) {
           if ($window.confirm('Really delete ' + secretId + '?')) {
             api.deleteObject($routeParams.projectId, $routeParams.environmentId, secretId)

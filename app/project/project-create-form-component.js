@@ -1,16 +1,16 @@
 angular
   .module('secretStash')
-  .component('secretCreateForm', {
-    templateUrl: 'secret/secret-create-form.html',
+  .component('projectCreateForm', {
+    templateUrl: 'project/project-create-form.html',
     controller: ['$scope', '$routeParams', 'stashApiService', 
       function($scope, $routeParams, api) {
         var self = this;
         
         /* Functions */
-        self.createSecret = function() {
-          api.putObject(self.secret, $routeParams.projectId, $routeParams.environmentId).then(
+        self.createProject = function() {
+          api.putObject(self.project).then(
               function(result) {
-                self.secret = {}
+                self.project = {};
                 self.onCreate();
               }
           );

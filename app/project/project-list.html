@@ -1,19 +1,26 @@
-<h1>Secret Stash</h1>
+<h1>secret stash</h1>
+A tool for managing your secrets.
 <p class="text-right">
-	<a href="#" class="btn btn-primary glyphicon glyphicon-plus"></a>
+	<button
+		class="btn btn-primary glyphicon glyphicon-plus"
+		title="Create a new project"
+		data-toggle="modal"
+		data-target="#newProjectModal">
+	</button>
 </p>
 <table class="table table-striped">
 	<tr>
-		<th class="object-id">Project ID</th>
-		<th class="object-description">Description</th>
-		<th class="object-options">Options</th>
+		<th>Project ID</th>
+		<th>Description</th>
+		<th>Options</th>
 	</tr>
 	<tr ng-repeat="project in projects">
-		<td><a href="/#!/projects/{{project.projectId}}">{{project.projectId}}</a></td>
-		<td>{{project.description}}</td>
-		<td>
-			<span class="stash-link glyphicon glyphicon-pencil" title="Edit"></span>
-			<span class="stash-link glyphicon glyphicon-remove" title="Delete"></span>
+		<td class="object-id"><a href="/#!/projects/{{project.projectId}}">{{project.projectId}}</a></td>
+		<td class="object-description">{{project.description}}</td>
+		<td class="object-options">
+			<span class="stash-link glyphicon glyphicon-pencil" title="Edit {{project.projectId}}"></span>
+			<span class="stash-link glyphicon glyphicon-remove" ng-click="$ctrl.deleteProject(project.projectId)" title="Delete {{project.projectId}}"></span>
 		</td>
 	</tr>
 </table>
+<project-create-form modal-id="newProjectModal" on-create="$ctrl.updateProjectList()"></project-create-form>
