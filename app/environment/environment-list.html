@@ -4,11 +4,11 @@
 </h1>
 <p>{{$ctrl.project.description}}</p>
 <p class="text-right">
-	<button 
+	<!-- <button 
 		type="button"
 		class="btn btn-default glyphicon glyphicon-pencil"
 		title="Edit {{$ctrl.project.projectId}}">
-	</button>
+	</button> -->
 	<button 
 		type="button"
 		class="btn btn-primary glyphicon glyphicon-plus"
@@ -31,7 +31,7 @@
 		<td class="environment-permissions">{{environment.acl.roles.join(', ')}}</td>
 		<td class="environment-permissions">{{environment.acl.groups.join(', ')}}</td>
 		<td>
-			<span class="stash-link glyphicon glyphicon-pencil" title="Edit {{environment.environmentId}}"></span>
+			<!-- <span class="stash-link glyphicon glyphicon-pencil" title="Edit {{environment.environmentId}}"></span> -->
 			<span
 				class="stash-link glyphicon glyphicon-remove" 
 				ng-click="$ctrl.deleteEnvironment(environment.environmentId)"
