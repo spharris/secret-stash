@@ -6,28 +6,18 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-import javax.inject.Inject;
-
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.ByteStreams;
-import com.google.inject.Guice;
-
-import io.github.spharris.stash.service.testing.TestServiceModule;
 
 public class JsonUtilTest {
 
-  @Inject JsonUtil json;
+  JsonUtil json = new JsonUtil(new ObjectMapper());
   
   @Rule public ExpectedException thrown = ExpectedException.none();
-  
-  @Before
-  public void createInjector() {
-    Guice.createInjector(new TestServiceModule()).injectMembers(this);
-  }
   
   @Test
   public void writeToString() {
