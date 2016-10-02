@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import io.github.spharris.stash.Project;
 import io.github.spharris.stash.service.ProjectService;
 import io.github.spharris.stash.service.request.CreateProjectRequest;
+import io.github.spharris.stash.service.request.DeleteProjectRequest;
 import io.github.spharris.stash.service.request.GetProjectRequest;
 import io.github.spharris.stash.service.request.ListProjectsRequest;
 
@@ -79,6 +80,10 @@ public final class ProjectController {
   @Path("/projects/{projectId}")
   public Response<Void> deleteProject(
       @PathParam("projectId") String projectId) {
+    projectService.deleteProject(DeleteProjectRequest.builder()
+      .setProjectId(projectId)
+      .build());
+    
     return Response.<Void>builder().build();
   }
 }
