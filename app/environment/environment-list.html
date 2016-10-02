@@ -1,10 +1,21 @@
 <h1>
 	<a class="header-link" href="/#!/">home</a> > 
-	{{project.projectId}}
+	{{$ctrl.project.projectId}}
 </h1>
-<p>{{project.description}}</p>
+<p>{{$ctrl.project.description}}</p>
 <p class="text-right">
-	<a href="#" class="btn btn-primary glyphicon glyphicon-plus"></a>
+	<button 
+		type="button"
+		class="btn btn-default glyphicon glyphicon-pencil"
+		title="Edit {{$ctrl.project.projectId}}">
+	</button>
+	<button 
+		type="button"
+		class="btn btn-primary glyphicon glyphicon-plus"
+		title="Create a new environment"
+		data-toggle="modal"
+		data-target="#newEnvironmentModal">
+	</button>
 </p>
 <table class="table table-striped">
 	<tr>
@@ -15,13 +26,18 @@
 		<th>Options</th>
 	</tr>
 	<tr ng-repeat="environment in environments">
-		<td class="object-id"><a href="/#!/projects/{{project.projectId}}/environments/{{environment.environmentId}}">{{environment.environmentId}}</a></td>
+		<td class="object-id"><a href="/#!/projects/{{$ctrl.project.projectId}}/environments/{{environment.environmentId}}">{{environment.environmentId}}</a></td>
 		<td class="object-description">{{environment.description}}</td>
 		<td class="environment-permissions">{{environment.acl.roles.join(', ')}}</td>
 		<td class="environment-permissions">{{environment.acl.groups.join(', ')}}</td>
 		<td>
 			<span class="stash-link glyphicon glyphicon-pencil" title="Edit {{environment.environmentId}}"></span>
-			<span class="stash-link glyphicon glyphicon-remove" title="Delete {{environment.environmentId}}"></span>
+			<span
+				class="stash-link glyphicon glyphicon-remove" 
+				ng-click="$ctrl.deleteEnvironment(environment.environmentId)"
+				title="Delete {{environment.environmentId}}">
+			</span>
 		</td>
 	</tr>
 </table>
+<environment-create-form modal-id="newEnvironmentModal" on-create="$ctrl.updateEnvironmentList()"></environment-create-form>

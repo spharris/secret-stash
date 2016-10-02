@@ -6,6 +6,7 @@ angular
       function($scope, $routeParams, $window, api) {
         var self = this;
 
+        self.projectId = $routeParams.projectId;
         self.environment = null;
         self.secrets = [];
 

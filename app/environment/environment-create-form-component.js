@@ -10,6 +10,7 @@ angular
         self.createEnvironment = function() {
           api.putObject(self.environment, $routeParams.projectId).then(
               function(result) {
+                self.environment = {};
                 self.onCreate();
               }
           );
