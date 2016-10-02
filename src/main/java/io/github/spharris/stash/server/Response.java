@@ -8,6 +8,8 @@ import com.google.common.collect.ImmutableList;
 @AutoValue
 public abstract class Response<T> {
   
+  private static final Response<Object> EMPTY_RESPONSE = Response.builder().build();  
+  
   Response() {}
   
   public abstract @Nullable T getValue();
@@ -24,8 +26,9 @@ public abstract class Response<T> {
         .build();
   }
   
+  @SuppressWarnings("unchecked")
   public static <T> Response<T> of() {
-    return Response.<T>builder().build();
+    return (Response<T>) EMPTY_RESPONSE;
   }
   
   @AutoValue.Builder
