@@ -23,5 +23,7 @@ class StashServerModule extends AbstractModule {
     bind(ProjectController.class);
     bind(EnvironmentController.class);
     bind(SecretController.class);
+    
+    bind(AwsController.class);
   }
 }
