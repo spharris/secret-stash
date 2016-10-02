@@ -38,11 +38,9 @@ public final class EnvironmentController {
   @Path("/projects/{projectId}/environments")
   public Response<ImmutableList<Environment>> listEnvironments(
       @PathParam("projectId") String projectId) {
-    return Response.<ImmutableList<Environment>>builder()
-        .setValue(environmentService.listEnvironments(ListEnvironmentsRequest.builder()
-          .setProjectId(projectId)
-          .build()))
-        .build();
+    return Response.of(environmentService.listEnvironments(ListEnvironmentsRequest.builder()
+      .setProjectId(projectId)
+      .build()));
   }
   
   @PUT
@@ -50,12 +48,10 @@ public final class EnvironmentController {
   public Response<Environment> createEnvironment(
       @PathParam("projectId") String projectId,
       Environment environment) {
-    return Response.<Environment>builder()
-        .setValue(environmentService.createEnvironment(CreateEnvironmentRequest.builder()
-          .setProjectId(projectId)
-          .setEnvironment(environment)
-          .build()))
-        .build();
+    return Response.of(environmentService.createEnvironment(CreateEnvironmentRequest.builder()
+      .setProjectId(projectId)
+      .setEnvironment(environment)
+      .build()));
   }
    
   @GET
@@ -64,16 +60,14 @@ public final class EnvironmentController {
       @PathParam("projectId") String projectId,
       @PathParam("environmentId") String environmentId) {
     Optional<Environment> environment = environmentService.getEnvironment(GetEnvironmentRequest.builder()
-          .setProjectId(projectId)
-          .setEnvironmentId(environmentId)
-          .build());
+      .setProjectId(projectId)
+      .setEnvironmentId(environmentId)
+      .build());
     
     if (!environment.isPresent()) {
       throw new NotFoundException();
     } else {
-      return Response.<Environment>builder()
-        .setValue(environment.get())
-        .build();
+      return Response.of(environment.get());
     }
   }
   
@@ -83,7 +77,7 @@ public final class EnvironmentController {
       @PathParam("projectId") String projectId,
       @PathParam("environmentId") String environmentId,
       Environment environment) {
-    return Response.<Environment>builder().build();
+    return Response.of();
   }
   
   @DELETE
@@ -96,6 +90,6 @@ public final class EnvironmentController {
       .setEnvironmentId(environmentId)
       .build());
     
-    return Response.<Void>builder().build();
+    return Response.of();
   }
 }

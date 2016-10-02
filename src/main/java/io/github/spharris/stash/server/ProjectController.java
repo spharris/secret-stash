@@ -37,19 +37,15 @@ public final class ProjectController {
   @GET
   @Path("/projects")
   public Response<ImmutableList<Project>> listProjects() {
-    return Response.<ImmutableList<Project>>builder()
-        .setValue(projectService.listProjects(ListProjectsRequest.builder().build()))
-        .build();
+    return Response.of(projectService.listProjects(ListProjectsRequest.builder().build()));
   }
   
   @PUT
   @Path("/projects")
   public Response<Project> createProject(Project project) {
-    return Response.<Project>builder()
-        .setValue(projectService.createProject(CreateProjectRequest.builder()
-          .setProject(project)
-          .build()))
-        .build();
+    return Response.of(projectService.createProject(CreateProjectRequest.builder()
+      .setProject(project)
+      .build()));
   }
   
   @GET
@@ -57,15 +53,13 @@ public final class ProjectController {
   public Response<Project> getProject(
       @PathParam("projectId") String projectId) {
     Optional<Project> project = projectService.getProject(GetProjectRequest.builder()
-          .setProjectId(projectId)
-          .build());
+      .setProjectId(projectId)
+      .build());
     
     if (!project.isPresent()) {
       throw new NotFoundException();
     } else {
-      return Response.<Project>builder()
-        .setValue(project.get())
-        .build();
+      return Response.of(project.get());
     }
   }
   
@@ -73,7 +67,7 @@ public final class ProjectController {
   @Path("/projects/{projectId}")
   public Response<Project> updateProject(
       @PathParam("projectId") String projectId, Project secret) {
-    return Response.<Project>builder().build();
+    return Response.of();
   }
   
   @DELETE
@@ -84,6 +78,6 @@ public final class ProjectController {
       .setProjectId(projectId)
       .build());
     
-    return Response.<Void>builder().build();
+    return Response.of();
   }
 }

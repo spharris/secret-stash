@@ -41,12 +41,10 @@ public final class SecretController {
   public Response<ImmutableList<Secret>> listSecrets(
       @PathParam("projectId") String projectId,
       @PathParam("environmentId") String environmentId) {
-    return Response.<ImmutableList<Secret>>builder()
-        .setValue(secretService.listSecrets(ListSecretsRequest.builder()
-          .setProjectId(projectId)
-          .setEnvironmentId(environmentId)
-          .build()))
-        .build();
+    return Response.of(secretService.listSecrets(ListSecretsRequest.builder()
+      .setProjectId(projectId)
+      .setEnvironmentId(environmentId)
+      .build()));
   }
   
   @PUT
@@ -55,13 +53,11 @@ public final class SecretController {
       @PathParam("projectId") String projectId,
       @PathParam("environmentId") String environmentId,
       Secret secret) {
-    return Response.<Secret>builder()
-        .setValue(secretService.createSecret(CreateSecretRequest.builder()
-          .setProjectId(projectId)
-          .setEnvironmentId(environmentId)
-          .setSecret(secret)
-          .build()))
-        .build();
+    return Response.of(secretService.createSecret(CreateSecretRequest.builder()
+      .setProjectId(projectId)
+      .setEnvironmentId(environmentId)
+      .setSecret(secret)
+      .build()));
   }
   
   @GET
@@ -73,19 +69,17 @@ public final class SecretController {
       @DefaultValue("false") @QueryParam("includeSecretValue") boolean includeSecretValue) {
     
     Optional<Secret> secret = secretService.getSecret(GetSecretRequest.builder()
-          .setProjectId(projectId)
-          .setEnvironmentId(environmentId)
-          .setSecretId(secretId)
-          .setIncludeSecretValue(includeSecretValue)
-          .build());
+      .setProjectId(projectId)
+      .setEnvironmentId(environmentId)
+      .setSecretId(secretId)
+      .setIncludeSecretValue(includeSecretValue)
+      .build());
     
     if (!secret.isPresent()) {
       throw new NotFoundException();
     }
     
-    return Response.<Secret>builder()
-        .setValue(secret.get())
-        .build();
+    return Response.of(secret.get());
   }
   
   @PUT
@@ -95,7 +89,7 @@ public final class SecretController {
       @PathParam("environmentId") String environmentId,
       @PathParam("secretId") String secretId,
       Secret secret) {
-    return Response.<Secret>builder().build();
+    return Response.of();
   }
   
   @DELETE
@@ -110,6 +104,6 @@ public final class SecretController {
       .setSecretId(secretId)
       .build());
 
-    return Response.<Void>builder().build();
+    return Response.of();
   }
 }

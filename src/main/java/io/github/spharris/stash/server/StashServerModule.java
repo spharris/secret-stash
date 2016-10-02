@@ -1,5 +1,6 @@
 package io.github.spharris.stash.server;
 
+import com.amazonaws.services.identitymanagement.AmazonIdentityManagement;
 import com.google.inject.AbstractModule;
 
 import io.github.spharris.stash.service.EnvironmentService;
@@ -13,6 +14,8 @@ class StashServerModule extends AbstractModule {
 
   @Override
   protected void configure() {
+    requireBinding(AmazonIdentityManagement.class);
+
     requireBinding(ProjectService.class);
     requireBinding(EnvironmentService.class);
     requireBinding(SecretService.class);
