@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import io.github.spharris.stash.Environment;
 import io.github.spharris.stash.service.EnvironmentService;
 import io.github.spharris.stash.service.request.CreateEnvironmentRequest;
+import io.github.spharris.stash.service.request.DeleteEnvironmentRequest;
 import io.github.spharris.stash.service.request.GetEnvironmentRequest;
 import io.github.spharris.stash.service.request.ListEnvironmentsRequest;
 
@@ -90,6 +91,11 @@ public final class EnvironmentController {
   public Response<Void> deleteEnvironment(
       @PathParam("projectId") String projectId,
       @PathParam("environmentId") String environmentId) {
+    environmentService.deleteEnvironment(DeleteEnvironmentRequest.builder()
+      .setProjectId(projectId)
+      .setEnvironmentId(environmentId)
+      .build());
+    
     return Response.<Void>builder().build();
   }
 }
