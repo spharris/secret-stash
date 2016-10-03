@@ -1,11 +1,15 @@
 package io.github.spharris.stash.server;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import org.apache.commons.cli.ParseException;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.resource.PathResource;
 import org.jboss.resteasy.plugins.guice.GuiceResteasyBootstrapServletContextListener;
 import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 
@@ -58,9 +62,11 @@ public final class SecretStash {
     return handler;
   }
   
-  private static ServletContextHandler createSite(Server server) {
+  private static ServletContextHandler createSite(Server server) 
+      throws URISyntaxException, IOException {
     ServletContextHandler handler = new ServletContextHandler(server, "/");
-    handler.setResourceBase("app/");
+    handler.setBaseResource(new PathResource(
+      SecretStash.class.getClassLoader().getResource("webapp")));
     handler.addServlet(DefaultServlet.class, "/*");
     
     return handler;

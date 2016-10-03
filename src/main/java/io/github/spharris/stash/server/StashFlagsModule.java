@@ -85,7 +85,7 @@ class StashFlagsModule extends AbstractModule {
           .build());
     
     CommandLine helpFlag = new DefaultParser().parse(helpDef, args, true);
-    if (helpFlag.hasOption("help") || helpFlag.getOptions().length == 0) {
+    if (helpFlag.hasOption("help")) {
       new HelpFormatter().printHelp("secret-stash", flagDef, true);
       System.exit(0);
     }
