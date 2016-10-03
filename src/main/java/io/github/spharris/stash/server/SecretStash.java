@@ -1,5 +1,6 @@
 package io.github.spharris.stash.server;
 
+import org.apache.commons.cli.ParseException;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.DefaultServlet;
@@ -16,8 +17,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Module;
 
+import io.github.spharris.stash.server.Annotations.Port;
 import io.github.spharris.stash.service.StashServiceModule;
 import io.github.spharris.stash.service.db.DatabaseService;
 import io.github.spharris.stash.service.db.StashDatabaseModule;
@@ -28,10 +31,11 @@ import io.github.spharris.stash.service.db.StashDatabaseModule;
 public final class SecretStash {
 
   public static void main(String[] args) throws Exception {
-    Server server = new Server(3000);
+    Injector injector = Guice.createInjector(getModules(args));
+    Server server = new Server(injector.getInstance(Key.get(Integer.class, Port.class)));
     
     HandlerCollection collection = new HandlerCollection();
-    collection.addHandler(createApi(server));
+    collection.addHandler(createApi(server, injector));
     collection.addHandler(createSite(server));
     
     server.setHandler(collection);
@@ -40,10 +44,9 @@ public final class SecretStash {
     server.join();
   }
   
-  private static ServletContextHandler createApi(Server server) throws Exception {
+  private static ServletContextHandler createApi(Server server, Injector injector)
+      throws Exception {
     ServletContextHandler handler = new ServletContextHandler(server, "/api");
-    
-    Injector injector = Guice.createInjector(getModules());
     handler.addEventListener(injector.getInstance(
       GuiceResteasyBootstrapServletContextListener.class));
 
@@ -63,8 +66,9 @@ public final class SecretStash {
     return handler;
   }
   
-  private static ImmutableList<Module> getModules() {
+  private static ImmutableList<Module> getModules(String[] args) throws ParseException {
     return ImmutableList.of(
+      new StashFlagsModule(args),
       new StashDatabaseModule(),
       new StashServiceModule(),
       new StashServerModule(),

@@ -32,6 +32,10 @@ public class StashServiceModule extends AbstractModule {
   @Override
   protected void configure() {
     
+    requireBinding(Key.get(String.class, BucketOfSecrets.class));
+    requireBinding(Key.get(String.class, PolicyPath.class));
+    requireBinding(Key.get(String.class, PolicyPrefix.class));
+    
     requireBinding(ProjectDao.class);
     requireBinding(EnvironmentDao.class);
     requireBinding(SecretDao.class);
@@ -51,7 +55,7 @@ public class StashServiceModule extends AbstractModule {
     bind(SecretService.class).to(SecretServiceImpl.class);
     bind(PolicyService.class).to(PolicyServiceImpl.class);
     
-     bind(ObjectMapper.class).toInstance(new ObjectMapper()
+    bind(ObjectMapper.class).toInstance(new ObjectMapper()
       .setSerializationInclusion(Include.NON_NULL)
       .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
       .registerModule(new GuavaModule())
