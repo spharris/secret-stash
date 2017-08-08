@@ -43,6 +43,7 @@ public class EnvironmentServiceImpl implements EnvironmentService {
   public Environment createEnvironment(CreateEnvironmentRequest request) {
     Environment environment = request.getEnvironment();
     
+    // Do this first to make sure that groups are valid 
     Policy policy = policyService.createEnvironmentPolicy(CreateEnvironmentPolicyRequest.builder()
       .setProjectId(request.getProjectId())
       .setEnvironment(request.getEnvironment())
